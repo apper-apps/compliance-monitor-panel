@@ -186,7 +186,7 @@ async deletePolicy(id) {
     try {
       await delay(400)
       
-      const originalPolicy = policies.find(p => p.id === id)
+const originalPolicy = policies.find(p => p.Id === parseInt(id))
       
       if (!originalPolicy) {
         throw new Error('Policy not found')
@@ -194,7 +194,7 @@ async deletePolicy(id) {
       
       const duplicatedPolicy = {
         ...originalPolicy,
-        id: `policy_${Date.now()}`,
+Id: Math.max(...policies.map(p => p.Id), 0) + 1,
         name: `${originalPolicy.name} (Copy)`,
         status: 'draft',
         createdAt: new Date().toISOString(),
@@ -288,6 +288,152 @@ async deletePolicy(id) {
   // Alias method for Dashboard component compatibility
   async getRecentPolicies(limit = 5) {
     return this.getRecent(limit)
+  }
+// Geolocation and policy recommendation methods
+  async detectUserCountry() {
+    try {
+      // Try browser geolocation first
+      if (navigator.geolocation) {
+        try {
+          const position = await this.getCurrentPosition()
+          const country = await this.getCountryFromCoordinates(position.coords.latitude, position.coords.longitude)
+          if (country) return country
+        } catch (geoError) {
+          console.warn('Browser geolocation failed:', geoError.message)
+        }
+      }
+
+      // Fallback to IP-based detection
+      return await this.getCountryFromIP()
+    } catch (error) {
+      console.warn('Country detection failed:', error.message)
+      return null
+    }
+  }
+
+  getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        timeout: 10000,
+        enableHighAccuracy: false
+      })
+    })
+  }
+
+  async getCountryFromCoordinates(lat, lon) {
+    // Simple country detection based on coordinate ranges
+    // In a real app, you'd use a proper geocoding service
+    const countryRanges = {
+      'us': { latMin: 24, latMax: 49, lonMin: -125, lonMax: -66 },
+      'ca': { latMin: 41, latMax: 70, lonMin: -141, lonMax: -52 },
+      'uk': { latMin: 49, latMax: 61, lonMin: -8, lonMax: 2 },
+      'de': { latMin: 47, latMax: 55, lonMin: 5, lonMax: 16 },
+      'fr': { latMin: 41, latMax: 51, lonMin: -5, lonMax: 10 },
+      'th': { latMin: 5, latMax: 21, lonMin: 97, lonMax: 106 },
+      'sg': { latMin: 1, latMax: 2, lonMin: 103, lonMax: 104 },
+      'au': { latMin: -44, latMax: -10, lonMin: 113, lonMax: 154 },
+      'jp': { latMin: 24, latMax: 46, lonMin: 123, lonMax: 146 },
+      'br': { latMin: -34, latMax: 5, lonMin: -74, lonMax: -34 }
+    }
+
+    for (const [country, range] of Object.entries(countryRanges)) {
+      if (lat >= range.latMin && lat <= range.latMax && 
+          lon >= range.lonMin && lon <= range.lonMax) {
+        return country
+      }
+    }
+    return null
+  }
+
+  async getCountryFromIP() {
+    try {
+      await delay(200)
+      
+      // Simulate IP-based country detection
+      // In a real app, you'd call an IP geolocation service like ipapi.co or ipinfo.io
+      const mockDetection = {
+        // Simulate different countries for testing
+        'us': 0.3,
+        'de': 0.15,
+        'uk': 0.1,
+        'fr': 0.1,
+        'th': 0.1,
+        'sg': 0.05,
+        'ca': 0.05,
+        'au': 0.05,
+        'br': 0.05,
+        'jp': 0.05
+      }
+
+      const random = Math.random()
+      let cumulative = 0
+      for (const [country, probability] of Object.entries(mockDetection)) {
+        cumulative += probability
+        if (random <= cumulative) {
+          return country
+        }
+      }
+      
+      return 'us' // fallback
+    } catch (error) {
+      throw new Error('IP-based detection failed')
+    }
+  }
+
+  getRecommendedPoliciesForCountry(countryCode) {
+    const countryToRegulations = {
+      // European Union countries - GDPR
+      'de': ['gdpr-compliance'],
+      'fr': ['gdpr-compliance'],
+      'it': ['gdpr-compliance'],
+      'es': ['gdpr-compliance'],
+      'nl': ['gdpr-compliance'],
+      'be': ['gdpr-compliance'],
+      'at': ['gdpr-compliance'],
+      'dk': ['gdpr-compliance'],
+      'fi': ['gdpr-compliance'],
+      'se': ['gdpr-compliance'],
+      'ie': ['gdpr-compliance'],
+      'pt': ['gdpr-compliance'],
+      'gr': ['gdpr-compliance'],
+      'lu': ['gdpr-compliance'],
+      'cy': ['gdpr-compliance'],
+      'mt': ['gdpr-compliance'],
+      'si': ['gdpr-compliance'],
+      'sk': ['gdpr-compliance'],
+      'ee': ['gdpr-compliance'],
+      'lv': ['gdpr-compliance'],
+      'lt': ['gdpr-compliance'],
+      'pl': ['gdpr-compliance'],
+      'cz': ['gdpr-compliance'],
+      'hu': ['gdpr-compliance'],
+      'ro': ['gdpr-compliance'],
+      'bg': ['gdpr-compliance'],
+      'hr': ['gdpr-compliance'],
+      
+      // United Kingdom - GDPR equivalent
+      'uk': ['gdpr-compliance'],
+      
+      // United States - CCPA
+      'us': ['ccpa-compliance'],
+      
+      // Canada - PIPEDA
+      'ca': ['pipeda-canada'],
+      
+      // Thailand - PDPA
+      'th': ['pdpa-thailand'],
+      
+      // Singapore - PDPA
+      'sg': ['pdpa-singapore'],
+      
+      // Australia - Privacy Act
+      'au': ['privacy-act-australia'],
+      
+      // Brazil - LGPD
+      'br': ['lgpd-brazil']
+    }
+
+    return countryToRegulations[countryCode] || ['privacy-policy']
   }
 }
 

@@ -13,12 +13,13 @@ const PolicyCreator = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditing = Boolean(id)
-  
-  const [currentStep, setCurrentStep] = useState(1)
+const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
-  
+  const [detectedCountry, setDetectedCountry] = useState(null)
+  const [recommendedPolicies, setRecommendedPolicies] = useState([])
+  const [geolocationLoading, setGeolocationLoading] = useState(false)
   const [formData, setFormData] = useState({
     // Step 1: Policy Type
     type: '',
@@ -104,33 +105,97 @@ const policyTypes = [
       label: 'GDPR Privacy Policy',
       description: 'Comprehensive GDPR-compliant privacy policy with all required sections',
       icon: 'Shield',
-      featured: true
+      featured: true,
+      regions: ['EU', 'EEA'],
+      countries: ['de', 'fr', 'it', 'es', 'nl', 'be', 'at', 'dk', 'fi', 'se', 'ie', 'pt', 'gr', 'lu', 'cy', 'mt', 'si', 'sk', 'ee', 'lv', 'lt', 'pl', 'cz', 'hu', 'ro', 'bg', 'hr'],
+      badge: 'GDPR Ready'
+    },
+    {
+      value: 'pdpa-thailand',
+      label: 'PDPA Thailand Policy',
+      description: 'Personal Data Protection Act (PDPA) compliance for Thailand',
+      icon: 'Shield',
+      featured: true,
+      regions: ['APAC'],
+      countries: ['th'],
+      badge: 'PDPA Ready'
+    },
+    {
+      value: 'pdpa-singapore',
+      label: 'PDPA Singapore Policy',
+      description: 'Personal Data Protection Act compliance for Singapore',
+      icon: 'Shield',
+      featured: true,
+      regions: ['APAC'],
+      countries: ['sg'],
+      badge: 'PDPA Ready'
+    },
+    {
+      value: 'ccpa-compliance',
+      label: 'CCPA Privacy Notice',
+      description: 'California Consumer Privacy Act compliance',
+      icon: 'UserCheck',
+      featured: true,
+      regions: ['NA'],
+      countries: ['us'],
+      badge: 'CCPA Ready'
+    },
+    {
+      value: 'pipeda-canada',
+      label: 'PIPEDA Privacy Policy',
+      description: 'Personal Information Protection and Electronic Documents Act compliance',
+      icon: 'Shield',
+      featured: true,
+      regions: ['NA'],
+      countries: ['ca'],
+      badge: 'PIPEDA Ready'
     },
     {
       value: 'terms-of-service',
       label: 'Terms of Service',
       description: 'Comprehensive terms and conditions with legal protections',
       icon: 'FileText',
-      featured: true
+      featured: true,
+      regions: ['Global'],
+      countries: [],
+      badge: 'Universal'
     },
     {
       value: 'cookie-policy',
       label: 'Cookie Consent Policy',
-      description: 'GDPR-compliant cookie consent with granular controls',
+      description: 'Cookie consent with granular controls',
       icon: 'Cookie',
-      featured: true
+      featured: true,
+      regions: ['Global'],
+      countries: [],
+      badge: 'Global'
     },
     {
       value: 'privacy-policy',
       label: 'General Privacy Policy',
       description: 'Standard privacy policy for basic compliance',
-      icon: 'Lock'
+      icon: 'Lock',
+      regions: ['Global'],
+      countries: [],
+      badge: 'Basic'
     },
     {
-      value: 'ccpa-compliance',
-      label: 'CCPA Privacy Notice',
-      description: 'California consumer privacy compliance',
-      icon: 'UserCheck'
+      value: 'lgpd-brazil',
+      label: 'LGPD Privacy Policy',
+      description: 'Lei Geral de Proteção de Dados compliance for Brazil',
+      icon: 'Shield',
+      regions: ['SA'],
+      countries: ['br'],
+      badge: 'LGPD Ready'
+    },
+    {
+      value: 'privacy-act-australia',
+      label: 'Privacy Act Policy',
+      description: 'Australian Privacy Principles compliance',
+      icon: 'Shield',
+      regions: ['APAC'],
+      countries: ['au'],
+      badge: 'APP Ready'
     }
   ]
 
@@ -144,14 +209,77 @@ const policyTypes = [
     { value: 'other', label: 'Other' }
   ]
 
-  const countries = [
-    { value: 'us', label: 'United States' },
-    { value: 'ca', label: 'Canada' },
-    { value: 'uk', label: 'United Kingdom' },
-    { value: 'de', label: 'Germany' },
-    { value: 'fr', label: 'France' },
-    { value: 'au', label: 'Australia' },
-    { value: 'other', label: 'Other' }
+const countries = [
+    // North America
+    { value: 'us', label: 'United States', region: 'North America' },
+    { value: 'ca', label: 'Canada', region: 'North America' },
+    { value: 'mx', label: 'Mexico', region: 'North America' },
+    
+    // Europe
+    { value: 'de', label: 'Germany', region: 'Europe' },
+    { value: 'fr', label: 'France', region: 'Europe' },
+    { value: 'uk', label: 'United Kingdom', region: 'Europe' },
+    { value: 'it', label: 'Italy', region: 'Europe' },
+    { value: 'es', label: 'Spain', region: 'Europe' },
+    { value: 'nl', label: 'Netherlands', region: 'Europe' },
+    { value: 'be', label: 'Belgium', region: 'Europe' },
+    { value: 'at', label: 'Austria', region: 'Europe' },
+    { value: 'ch', label: 'Switzerland', region: 'Europe' },
+    { value: 'dk', label: 'Denmark', region: 'Europe' },
+    { value: 'fi', label: 'Finland', region: 'Europe' },
+    { value: 'se', label: 'Sweden', region: 'Europe' },
+    { value: 'no', label: 'Norway', region: 'Europe' },
+    { value: 'ie', label: 'Ireland', region: 'Europe' },
+    { value: 'pt', label: 'Portugal', region: 'Europe' },
+    { value: 'gr', label: 'Greece', region: 'Europe' },
+    { value: 'pl', label: 'Poland', region: 'Europe' },
+    { value: 'cz', label: 'Czech Republic', region: 'Europe' },
+    { value: 'hu', label: 'Hungary', region: 'Europe' },
+    { value: 'ro', label: 'Romania', region: 'Europe' },
+    { value: 'bg', label: 'Bulgaria', region: 'Europe' },
+    { value: 'hr', label: 'Croatia', region: 'Europe' },
+    { value: 'si', label: 'Slovenia', region: 'Europe' },
+    { value: 'sk', label: 'Slovakia', region: 'Europe' },
+    { value: 'ee', label: 'Estonia', region: 'Europe' },
+    { value: 'lv', label: 'Latvia', region: 'Europe' },
+    { value: 'lt', label: 'Lithuania', region: 'Europe' },
+    { value: 'lu', label: 'Luxembourg', region: 'Europe' },
+    { value: 'cy', label: 'Cyprus', region: 'Europe' },
+    { value: 'mt', label: 'Malta', region: 'Europe' },
+    
+    // Asia Pacific
+    { value: 'th', label: 'Thailand', region: 'Asia Pacific' },
+    { value: 'sg', label: 'Singapore', region: 'Asia Pacific' },
+    { value: 'my', label: 'Malaysia', region: 'Asia Pacific' },
+    { value: 'id', label: 'Indonesia', region: 'Asia Pacific' },
+    { value: 'ph', label: 'Philippines', region: 'Asia Pacific' },
+    { value: 'vn', label: 'Vietnam', region: 'Asia Pacific' },
+    { value: 'jp', label: 'Japan', region: 'Asia Pacific' },
+    { value: 'kr', label: 'South Korea', region: 'Asia Pacific' },
+    { value: 'cn', label: 'China', region: 'Asia Pacific' },
+    { value: 'hk', label: 'Hong Kong', region: 'Asia Pacific' },
+    { value: 'tw', label: 'Taiwan', region: 'Asia Pacific' },
+    { value: 'au', label: 'Australia', region: 'Asia Pacific' },
+    { value: 'nz', label: 'New Zealand', region: 'Asia Pacific' },
+    { value: 'in', label: 'India', region: 'Asia Pacific' },
+    
+    // South America
+    { value: 'br', label: 'Brazil', region: 'South America' },
+    { value: 'ar', label: 'Argentina', region: 'South America' },
+    { value: 'cl', label: 'Chile', region: 'South America' },
+    { value: 'co', label: 'Colombia', region: 'South America' },
+    { value: 'pe', label: 'Peru', region: 'South America' },
+    { value: 'uy', label: 'Uruguay', region: 'South America' },
+    
+    // Africa & Middle East
+    { value: 'za', label: 'South Africa', region: 'Africa' },
+    { value: 'ng', label: 'Nigeria', region: 'Africa' },
+    { value: 'eg', label: 'Egypt', region: 'Africa' },
+    { value: 'ae', label: 'United Arab Emirates', region: 'Middle East' },
+    { value: 'sa', label: 'Saudi Arabia', region: 'Middle East' },
+    { value: 'il', label: 'Israel', region: 'Middle East' },
+    
+    { value: 'other', label: 'Other', region: 'Other' }
   ]
 
 const legalBasisOptions = [
@@ -163,11 +291,42 @@ const legalBasisOptions = [
     { value: 'legitimate-interests', label: 'Legitimate Interests (Article 6(1)(f))' }
   ]
 
-  useEffect(() => {
+useEffect(() => {
     if (isEditing) {
       loadPolicy()
+    } else {
+      detectUserLocation()
     }
   }, [id])
+
+  const detectUserLocation = async () => {
+    try {
+      setGeolocationLoading(true)
+      const country = await policyService.detectUserCountry()
+      if (country) {
+        setDetectedCountry(country)
+        handleInputChange('businessCountry', country)
+        updateRecommendedPolicies(country)
+      }
+    } catch (err) {
+      console.warn('Geolocation detection failed:', err.message)
+    } finally {
+      setGeolocationLoading(false)
+    }
+  }
+
+  const updateRecommendedPolicies = (countryCode) => {
+    const recommended = policyTypes.filter(type => 
+      type.countries.length === 0 || type.countries.includes(countryCode)
+    ).map(type => type.value)
+    setRecommendedPolicies(recommended)
+  }
+
+  useEffect(() => {
+    if (formData.businessCountry) {
+      updateRecommendedPolicies(formData.businessCountry)
+    }
+  }, [formData.businessCountry])
 
   const loadPolicy = async () => {
     try {
@@ -240,56 +399,160 @@ const legalBasisOptions = [
     handleSave('active')
   }
 
-  const renderStepContent = () => {
+const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return (
           <div className="space-y-6">
+            {/* Geolocation Detection Status */}
+            {geolocationLoading && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <div className="animate-spin">
+                    <ApperIcon name="Globe" className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Detecting your location...</p>
+                    <p className="text-xs text-blue-700">We'll recommend the best policy types for your region</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {detectedCountry && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3">
+                  <ApperIcon name="MapPin" className="h-5 w-5 text-green-600" />
+                  <div>
+                    <p className="text-sm font-medium text-green-900">
+                      Location detected: {countries.find(c => c.value === detectedCountry)?.label}
+                    </p>
+                    <p className="text-xs text-green-700">Policy recommendations updated based on your location</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Select Policy Type
               </h3>
+              
+              {/* Recommended Policies Section */}
+              {recommendedPolicies.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-md font-medium text-gray-900 mb-3 flex items-center">
+                    <ApperIcon name="Star" className="h-4 w-4 text-yellow-500 mr-2" />
+                    Recommended for Your Location
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {policyTypes
+                      .filter(type => recommendedPolicies.includes(type.value))
+                      .map((type) => (
+                        <motion.div
+                          key={type.value}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all relative ${
+                            formData.type === type.value
+                              ? 'border-primary bg-primary/10 ring-2 ring-primary/20'
+                              : 'border-yellow-300 bg-yellow-50 hover:border-yellow-400 hover:bg-yellow-100'
+                          }`}
+                          onClick={() => {
+                            handleInputChange('type', type.value)
+                            handleInputChange('title', type.label)
+                            handleInputChange('description', type.description)
+                          }}
+                        >
+                          <div className="absolute top-2 right-2">
+                            <span className="text-xs bg-yellow-500 text-white px-2 py-1 rounded-full">
+                              Recommended
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-3 mb-2">
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                              formData.type === type.value
+                                ? 'bg-primary text-white'
+                                : 'bg-yellow-500 text-white'
+                            }`}>
+                              <ApperIcon name={type.icon} className="h-5 w-5" />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900">{type.label}</h4>
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                {type.badge}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600">{type.description}</p>
+                        </motion.div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* All Policy Types */}
+              <h4 className="text-md font-medium text-gray-900 mb-3">All Policy Types</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-{policyTypes.map((type) => (
-                  <motion.div
-                    key={type.value}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      formData.type === type.value
-                        ? 'border-primary bg-primary/5'
-                        : type.featured
-                        ? 'border-primary/30 bg-primary/5 hover:border-primary'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => {
-                      handleInputChange('type', type.value)
-                      handleInputChange('title', type.label)
-                      handleInputChange('description', type.description)
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          formData.type === type.value
-                            ? 'bg-primary text-white'
-                            : type.featured
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          <ApperIcon name={type.icon} className="h-5 w-5" />
+                {policyTypes.map((type) => {
+                  const isRecommended = recommendedPolicies.includes(type.value)
+                  return (
+                    <motion.div
+                      key={type.value}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        formData.type === type.value
+                          ? 'border-primary bg-primary/5'
+                          : isRecommended
+                          ? 'border-yellow-200 bg-yellow-50/50 hover:border-yellow-300'
+                          : type.featured
+                          ? 'border-primary/30 bg-primary/5 hover:border-primary'
+                          : 'border-gray-200 hover:border-gray-300'
+                      } ${isRecommended ? 'opacity-60' : ''}`}
+                      onClick={() => {
+                        handleInputChange('type', type.value)
+                        handleInputChange('title', type.label)
+                        handleInputChange('description', type.description)
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            formData.type === type.value
+                              ? 'bg-primary text-white'
+                              : type.featured
+                              ? 'bg-primary text-white'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}>
+                            <ApperIcon name={type.icon} className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{type.label}</h4>
+                            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                              {type.badge}
+                            </span>
+                          </div>
                         </div>
-                        <h4 className="font-semibold text-gray-900">{type.label}</h4>
+                        {isRecommended && (
+                          <span className="text-xs text-yellow-600 font-medium">
+                            ↑ Shown above
+                          </span>
+                        )}
                       </div>
-                      {type.featured && (
-                        <span className="text-xs bg-success text-white px-2 py-1 rounded-full">
-                          GDPR Ready
-                        </span>
+                      <p className="text-sm text-gray-600">{type.description}</p>
+                      {type.regions.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {type.regions.map(region => (
+                            <span key={region} className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
+                              {region}
+                            </span>
+                          ))}
+                        </div>
                       )}
-                    </div>
-                    <p className="text-sm text-gray-600">{type.description}</p>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  )
+                })}
               </div>
             </div>
 
