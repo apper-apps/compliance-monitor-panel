@@ -34,7 +34,6 @@ useEffect(() => {
   }, []);
   
   const loadDashboardData = async () => {
-const loadDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -86,7 +85,7 @@ const loadDashboardData = async () => {
     }
   };
 
-const handleAlertAction = async (alert, action) => {
+  const handleAlertAction = async (alert, action) => {
     try {
       switch (action) {
         case 'review':
@@ -116,7 +115,7 @@ const handleAlertAction = async (alert, action) => {
     }
   };
 
-const getAlertIcon = (type) => {
+  const getAlertIcon = (type) => {
     switch (type) {
       case 'expiring': return 'Clock';
       case 'regulatory': return 'AlertTriangle';
@@ -151,7 +150,8 @@ const getAlertIcon = (type) => {
   const handleWidgetEdit = (widget) => {
     navigate(`/widgets/${widget.Id}/edit`);
   };
-if (loading) {
+
+  if (loading) {
     return <Loading type="dashboard" />;
   }
 
