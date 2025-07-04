@@ -22,45 +22,44 @@ const filterOptions = [
 ];
 
 const Policies = () => {
-  const navigate = useNavigate();
-  const [policies, setPolicies] = useState([])
-  const [filteredPolicies, setFilteredPolicies] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-const [searchTerm, setSearchTerm] = useState('')
-  const [selectedFilter, setSelectedFilter] = useState('all')
-
-  useEffect(() => {
-    loadPolicies()
+const navigate = useNavigate();
+  const [policies, setPolicies] = useState([]);
+  const [filteredPolicies, setFilteredPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+useEffect(() => {
+    loadPolicies();
   }, []);
   useEffect(() => {
-    filterPolicies()
+    filterPolicies();
   }, [policies, selectedFilter, searchTerm]);
   const loadPolicies = async () => {
-    try {
-      setError(null)
-      setLoading(true)
-      const data = await policyService.getAll()
-      setPolicies(data)
+try {
+      setError(null);
+      setLoading(true);
+      const data = await policyService.getAll();
+      setPolicies(data);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filterPolicies = () => {
+const filterPolicies = () => {
     // Ensure policies is an array before filtering
     if (!Array.isArray(policies)) {
-      setFilteredPolicies([])
-      return
+      setFilteredPolicies([]);
+      return;
     }
 
-    let filtered = policies
+    let filtered = policies;
 
     // Filter by status
     if (selectedFilter !== 'all') {
-      filtered = filtered.filter(policy => policy?.status === selectedFilter)
+      filtered = filtered.filter(policy => policy?.status === selectedFilter);
     }
 
     // Filter by search term
@@ -69,41 +68,39 @@ const [searchTerm, setSearchTerm] = useState('')
         policy?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         policy?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         policy?.type?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      );
     }
 
-    setFilteredPolicies(filtered)
-  }
+    setFilteredPolicies(filtered);
+  };
 
   const handleSearch = (term) => {
-    setSearchTerm(term)
-  }
-
-  const handleCreatePolicy = () => {
-    navigate('/policies/create')
-  }
+    setSearchTerm(term);
+  };
+const handleCreatePolicy = () => {
+    navigate('/policies/create');
+  };
 
   const handleEditPolicy = (policy) => {
-    navigate(`/policies/${policy.Id}/edit`)
-  }
+    navigate(`/policies/${policy.Id}/edit`);
+  };
 
   const handleDeletePolicy = async (policy) => {
     if (window.confirm('Are you sure you want to delete this policy?')) {
       try {
-        await policyService.delete(policy.Id)
-        setPolicies(policies.filter(p => p.Id !== policy.Id))
-        toast.success('Policy deleted successfully')
+        await policyService.delete(policy.Id);
+        setPolicies(policies.filter(p => p.Id !== policy.Id));
+        toast.success('Policy deleted successfully');
       } catch (err) {
-        toast.error('Failed to delete policy')
+        toast.error('Failed to delete policy');
       }
     }
-  }
+  };
 
   const handleViewPolicy = (policy) => {
     // In a real app, this would open a modal or navigate to a view page
-    toast.info('Policy view functionality coming soon')
-  }
-
+    toast.info('Policy view functionality coming soon');
+  };
   if (loading) {
     return <Loading type="cards" />
   }
@@ -181,20 +178,22 @@ const [searchTerm, setSearchTerm] = useState('')
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <PolicyCard
+<PolicyCard
                 policy={policy}
                 onEdit={handleEditPolicy}
                 onDelete={handleDeletePolicy}
-onView={handleViewPolicy}
+                onView={handleViewPolicy}
               />
             </motion.div>
           ))}
         </div>
       )}
+
       {/* Policy Templates */}
       {policies.length === 0 && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Get Started with Policy Templates
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -285,7 +284,7 @@ onView={handleViewPolicy}
                 <p className="text-sm text-blue-700 mb-3">
                   Our templates include all required GDPR elements: legal basis, data subject rights, 
                   controller information, retention periods, and cookie consent mechanisms.
-</p>
+                </p>
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Article 13 & 14</span>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Cookie Consent</span>
@@ -296,7 +295,6 @@ onView={handleViewPolicy}
             </div>
           </div>
         </div>
-</div>
       )}
     </div>
   );
