@@ -319,9 +319,14 @@ async createWidget(widgetData) {
         data: result.data
           .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
           .slice(0, limit)
-      }
+}
     }
     return result
+  }
+
+  // Alias for Dashboard compatibility
+  async getRecentWidgets(limit = 5) {
+    return this.getRecent(limit)
   }
 }
 
