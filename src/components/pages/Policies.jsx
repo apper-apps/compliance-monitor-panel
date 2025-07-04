@@ -37,7 +37,8 @@ const Policies = () => {
 useEffect(() => {
     filterPolicies()
   }, [policies, selectedFilter, searchTerm])
-const loadPolicies = async () => {
+
+  const loadPolicies = async () => {
     try {
       setError(null)
       setLoading(true)
@@ -50,7 +51,7 @@ const loadPolicies = async () => {
     }
   }
 
-const filterPolicies = () => {
+  const filterPolicies = () => {
     // Ensure policies is an array before filtering
     if (!Array.isArray(policies)) {
       setFilteredPolicies([])
