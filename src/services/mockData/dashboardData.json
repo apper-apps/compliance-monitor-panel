@@ -7,7 +7,119 @@
     "monthlyRevenue": 2340,
     "complianceScore": 95,
     "widgetImpressions": 45678,
-    "dataRequests": 23,
+"dataRequests": 23,
+    "policyAlerts": [
+      {
+        "Id": 1,
+        "title": "GDPR Privacy Policy Expiring Soon",
+        "description": "Your main GDPR privacy policy will expire in 15 days and requires review and renewal.",
+        "type": "expiring",
+        "priority": "high",
+        "category": "Expiration",
+        "policyId": 1,
+        "policyName": "GDPR Privacy Policy v2.1",
+        "timestamp": "2 hours ago",
+        "deadline": "Dec 15, 2024",
+        "actions": [
+          {
+            "type": "primary",
+            "label": "Review Policy",
+            "action": "review",
+            "icon": "Eye"
+          },
+          {
+            "type": "secondary",
+            "label": "Update",
+            "action": "update",
+            "icon": "Edit"
+          }
+        ]
+      },
+      {
+        "Id": 2,
+        "title": "New GDPR Regulation Update Available",
+        "description": "EU has released new guidance on AI and automated decision-making that affects your current policies.",
+        "type": "regulatory",
+        "priority": "medium",
+        "category": "Regulatory Change",
+        "timestamp": "4 hours ago",
+        "actions": [
+          {
+            "type": "primary",
+            "label": "View Changes",
+            "action": "review",
+            "icon": "ExternalLink"
+          },
+          {
+            "type": "secondary",
+            "label": "Update Policies",
+            "action": "update",
+            "icon": "RefreshCw"
+          }
+        ]
+      },
+      {
+        "Id": 3,
+        "title": "Cookie Consent Optimization Recommended",
+        "description": "Analytics show low consent rates. Consider updating your cookie banner design and messaging.",
+        "type": "recommendation",
+        "priority": "low",
+        "category": "Optimization",
+        "policyId": 3,
+        "policyName": "Cookie Consent Banner",
+        "timestamp": "1 day ago",
+        "actions": [
+          {
+            "type": "primary",
+            "label": "Optimize",
+            "action": "update",
+            "icon": "TrendingUp"
+          }
+        ]
+      },
+      {
+        "Id": 4,
+        "title": "Compliance Score Below Threshold",
+        "description": "Your overall compliance score has dropped to 78%. Review missing data processing agreements.",
+        "type": "compliance",
+        "priority": "high",
+        "category": "Compliance Risk",
+        "timestamp": "6 hours ago",
+        "actions": [
+          {
+            "type": "primary",
+            "label": "Review Issues",
+            "action": "review",
+            "icon": "AlertTriangle"
+          },
+          {
+            "type": "secondary",
+            "label": "Fix Now",
+            "action": "update",
+            "icon": "Wrench"
+          }
+        ]
+      },
+      {
+        "Id": 5,
+        "title": "Terms of Service Update Required",
+        "description": "Recent changes to your service offerings require updates to your Terms of Service document.",
+        "type": "update",
+        "priority": "medium",
+        "category": "Content Update",
+        "policyId": 2,
+        "policyName": "Terms of Service v1.4",
+        "timestamp": "3 days ago",
+        "actions": [
+          {
+            "type": "primary",
+            "label": "Update Terms",
+            "action": "update",
+            "icon": "Edit"
+          }
+        ]
+      }
+    ],
     "alerts": [
       {
         "Id": 1,

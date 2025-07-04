@@ -11,6 +11,8 @@ import Widgets from "@/components/pages/Widgets";
 import PolicyCard from "@/components/molecules/PolicyCard";
 import StatsCard from "@/components/molecules/StatsCard";
 import WidgetCard from "@/components/molecules/WidgetCard";
+import Badge from "@/components/atoms/Badge";
+import { toast } from "react-toastify";
 import policyService from "@/services/api/policyService";
 import dashboardService from "@/services/api/dashboardService";
 import widgetService from "@/services/api/widgetService";
@@ -18,19 +20,21 @@ function Dashboard() {
   const navigate = useNavigate()
   const userRole = 'agency' // This would come from auth context
   
-  const [dashboardData, setDashboardData] = useState(null)
+const [dashboardData, setDashboardData] = useState(null)
   const [recentPolicies, setRecentPolicies] = useState([])
   const [recentWidgets, setRecentWidgets] = useState([])
+  const [policyAlerts, setPolicyAlerts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [policiesLoading, setPoliciesLoading] = useState(false)
   const [widgetsLoading, setWidgetsLoading] = useState(false)
+  const [alertsExpanded, setAlertsExpanded] = useState(false)
   
   useEffect(() => {
     loadDashboardData()
   }, [])
   
-  const loadDashboardData = async () => {
+const loadDashboardData = async () => {
     try {
       setLoading(true)
       setError(null)
@@ -44,6 +48,10 @@ function Dashboard() {
       // Handle dashboard stats
       if (dashboardResponse?.success) {
         setDashboardData(dashboardResponse.data)
+        // Extract intelligent policy alerts
+        if (dashboardResponse.data?.policyAlerts) {
+          setPolicyAlerts(dashboardResponse.data.policyAlerts)
+        }
       } else {
         console.error('Failed to load dashboard stats:', dashboardResponse?.error)
       }
@@ -73,8 +81,58 @@ function Dashboard() {
     } catch (error) {
       console.error('Failed to load dashboard data:', error)
       setError(error.message || 'Failed to load dashboard data')
-} finally {
+    } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAlertAction = async (alert, action) => {
+    try {
+      switch (action) {
+        case 'review':
+          if (alert.policyId) {
+            navigate(`/policies/${alert.policyId}/edit`)
+          } else {
+            navigate('/policies')
+          }
+          break
+        case 'dismiss':
+          setPolicyAlerts(prev => prev.filter(a => a.Id !== alert.Id))
+          toast.success('Alert dismissed')
+          break
+        case 'update':
+          if (alert.policyId) {
+            navigate(`/policies/${alert.policyId}/edit`)
+          }
+          break
+        case 'view_all':
+          navigate('/policies?alerts=true')
+          break
+        default:
+          break
+      }
+    } catch (error) {
+      toast.error('Failed to handle alert action')
+    }
+  }
+
+  const getAlertIcon = (type) => {
+    switch (type) {
+      case 'expiring': return 'Clock'
+      case 'regulatory': return 'AlertTriangle'
+      case 'compliance': return 'ShieldAlert'
+      case 'recommendation': return 'Lightbulb'
+      case 'update': return 'RefreshCw'
+      default: return 'Info'
+    }
+  }
+
+  const getAlertVariant = (priority) => {
+    switch (priority) {
+      case 'high': return 'error'
+      case 'medium': return 'warning'
+      case 'low': return 'info'
+      default: return 'info'
     }
   }
 
@@ -334,40 +392,142 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Compliance Alerts */}
-      {dashboardData?.alerts && dashboardData.alerts.length > 0 && (
+{/* Intelligent Policy Updates & Alerts */}
+      {policyAlerts && policyAlerts.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Compliance Alerts
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Intelligent Policy Alerts
+              </h3>
+              <Badge variant="info" className="text-xs">
+                {policyAlerts.length} Active
+              </Badge>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleAlertAction({}, 'view_all')}
+              >
+                View All
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAlertsExpanded(!alertsExpanded)}
+              >
+                <ApperIcon 
+                  name={alertsExpanded ? 'ChevronUp' : 'ChevronDown'} 
+                  className="h-4 w-4" 
+                />
+              </Button>
+            </div>
+          </div>
+          
           <div className="space-y-3">
-            {dashboardData.alerts.map((alert) => (
+            {(alertsExpanded ? policyAlerts : policyAlerts.slice(0, 3)).map((alert) => (
               <motion.div
                 key={alert.Id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={`flex items-center space-x-3 p-3 rounded-lg ${
-                  alert.type === 'warning' ? 'bg-warning/10' : 'bg-info/10'
+                className={`border rounded-lg p-4 ${
+                  alert.priority === 'high' ? 'border-red-200 bg-red-50' :
+                  alert.priority === 'medium' ? 'border-yellow-200 bg-yellow-50' :
+                  'border-blue-200 bg-blue-50'
                 }`}
               >
-                <ApperIcon 
-                  name={alert.type === 'warning' ? 'AlertTriangle' : 'Info'} 
-                  className={`h-5 w-5 ${
-                    alert.type === 'warning' ? 'text-warning' : 'text-info'
-                  }`}
-                />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {alert.message}
-                  </p>
-                  <p className="text-xs text-gray-500">{alert.timestamp}</p>
+                <div className="flex items-start space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    alert.priority === 'high' ? 'bg-red-100' :
+                    alert.priority === 'medium' ? 'bg-yellow-100' :
+                    'bg-blue-100'
+                  }`}>
+                    <ApperIcon 
+                      name={getAlertIcon(alert.type)} 
+                      className={`h-4 w-4 ${
+                        alert.priority === 'high' ? 'text-red-600' :
+                        alert.priority === 'medium' ? 'text-yellow-600' :
+                        'text-blue-600'
+                      }`}
+                    />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 mb-1">
+                          {alert.title}
+                        </p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {alert.description}
+                        </p>
+                        {alert.policyName && (
+                          <p className="text-xs text-gray-500 mb-2">
+                            Policy: {alert.policyName}
+                          </p>
+                        )}
+                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                          <span>{alert.timestamp}</span>
+                          {alert.deadline && (
+                            <span className="text-red-600 font-medium">
+                              Deadline: {alert.deadline}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col space-y-1 ml-4">
+                        <Badge variant={getAlertVariant(alert.priority)} size="sm">
+                          {alert.priority.toUpperCase()}
+                        </Badge>
+                        <Badge variant="outline" size="sm">
+                          {alert.category}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 mt-3">
+                      {alert.actions?.map((action) => (
+                        <Button
+                          key={action.type}
+                          variant={action.type === 'primary' ? 'primary' : 'outline'}
+                          size="sm"
+                          onClick={() => handleAlertAction(alert, action.action)}
+                          className="text-xs"
+                        >
+                          <ApperIcon name={action.icon} className="h-3 w-3 mr-1" />
+                          {action.label}
+                        </Button>
+                      ))}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleAlertAction(alert, 'dismiss')}
+                        className="text-xs text-gray-500"
+                      >
+                        <ApperIcon name="X" className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <Button variant="ghost" size="sm">
-                  <ApperIcon name="X" className="h-4 w-4" />
-                </Button>
               </motion.div>
             ))}
           </div>
+          
+          {!alertsExpanded && policyAlerts.length > 3 && (
+            <div className="text-center mt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAlertsExpanded(true)}
+                className="text-sm text-gray-600"
+              >
+                Show {policyAlerts.length - 3} more alerts
+                <ApperIcon name="ChevronDown" className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
