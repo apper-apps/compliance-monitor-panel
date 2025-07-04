@@ -8,7 +8,7 @@ import Button from "@/components/atoms/Button";
 import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 import FormField from "@/components/molecules/FormField";
-import policyService from "@/services/api/policyService";
+import { policyService } from "@/services/api/policyService";
 
 const PolicyCreator = () => {
   const navigate = useNavigate()
