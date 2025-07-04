@@ -135,7 +135,7 @@ async updatePolicy(id, updateData) {
     }
   }
 
-async deletePolicy(id) {
+async deletePolicy(id, updateData) {
     try {
       await delay(400)
       
@@ -289,7 +289,9 @@ Id: Math.max(...policies.map(p => p.Id), 0) + 1,
   async getRecentPolicies(limit = 5) {
     return this.getRecent(limit)
   }
-// Geolocation and policy recommendation methods
+}
+
+  // Geolocation and policy recommendation methods
   async detectUserCountry() {
     try {
       // Try browser geolocation first
@@ -435,7 +437,213 @@ Id: Math.max(...policies.map(p => p.Id), 0) + 1,
 
     return countryToRegulations[countryCode] || ['privacy-policy']
   }
+return countryToRegulations[countryCode] || ['privacy-policy']
+  }
+
+  // AI Text Processing Methods
+  async rewriteText(text) {
+    try {
+      await delay(1500)
+      
+      // Simulate AI rewriting with enhanced clarity and professionalism
+      const rewrittenTexts = [
+        text.replace(/\b(we|our|us)\b/gi, 'the company')
+          .replace(/\b(you|your)\b/gi, 'users')
+          .replace(/collect/gi, 'gather')
+          .replace(/information/gi, 'data'),
+        
+        text.replace(/\b(may|might)\b/gi, 'will')
+          .replace(/\b(can|could)\b/gi, 'are able to')
+          .replace(/sometimes/gi, 'occasionally'),
+        
+        text.replace(/\b(help|assist)\b/gi, 'support')
+          .replace(/\b(use|utilize)\b/gi, 'employ')
+          .replace(/\b(get|obtain)\b/gi, 'acquire')
+      ]
+      
+      const randomRewrite = rewrittenTexts[Math.floor(Math.random() * rewrittenTexts.length)]
+      
+      return {
+        success: true,
+        data: {
+          originalText: text,
+          improvedText: randomRewrite,
+          changes: ['Enhanced clarity', 'Improved professional tone', 'Strengthened language']
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to rewrite text'
+      }
+    }
+  }
+
+  async improveWriting(text) {
+    try {
+      await delay(1200)
+      
+      // Simulate AI writing improvement
+      let improved = text
+        .replace(/\b(good|nice|great)\b/gi, 'excellent')
+        .replace(/\b(bad|poor)\b/gi, 'inadequate')
+        .replace(/\b(big|large)\b/gi, 'substantial')
+        .replace(/\b(small|little)\b/gi, 'minimal')
+        .replace(/\s+/g, ' ')
+        .trim()
+      
+      // Add transitional phrases for better flow
+      if (!improved.includes('Furthermore') && !improved.includes('Additionally')) {
+        const transitions = ['Furthermore, ', 'Additionally, ', 'Moreover, ', 'In addition, ']
+        const randomTransition = transitions[Math.floor(Math.random() * transitions.length)]
+        improved = randomTransition + improved.charAt(0).toLowerCase() + improved.slice(1)
+      }
+      
+      return {
+        success: true,
+        data: {
+          originalText: text,
+          improvedText: improved,
+          changes: ['Enhanced vocabulary', 'Improved flow', 'Added clarity']
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to improve writing'
+      }
+    }
+  }
+
+  async fixGrammar(text) {
+    try {
+      await delay(800)
+      
+      // Simulate grammar and spelling fixes
+      let corrected = text
+        .replace(/\b(there|their|they're)\b/gi, (match, p1, offset, string) => {
+          const beforeWord = string.charAt(offset - 1)
+          const afterWord = string.charAt(offset + match.length)
+          if (beforeWord === ' ' && afterWord === ' ') return 'their'
+          return match
+        })
+        .replace(/\b(its|it's)\b/gi, (match) => {
+          return Math.random() > 0.5 ? 'its' : "it's"
+        })
+        .replace(/\b(affect|effect)\b/gi, 'impact')
+        .replace(/([.!?])\s*([a-z])/g, (match, punct, letter) => {
+          return punct + ' ' + letter.toUpperCase()
+        })
+        .replace(/\s+/g, ' ')
+        .trim()
+      
+      // Ensure proper capitalization
+      corrected = corrected.charAt(0).toUpperCase() + corrected.slice(1)
+      
+      return {
+        success: true,
+        data: {
+          originalText: text,
+          improvedText: corrected,
+          changes: ['Fixed capitalization', 'Corrected common errors', 'Improved punctuation']
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to fix grammar'
+      }
+    }
+  }
+
+  async makeShorter(text) {
+    try {
+      await delay(1000)
+      
+      // Simulate text condensation
+      let shortened = text
+        .replace(/\b(in order to|so as to)\b/gi, 'to')
+        .replace(/\b(due to the fact that|because of the fact that)\b/gi, 'because')
+        .replace(/\b(at this point in time|at the present time)\b/gi, 'now')
+        .replace(/\b(for the purpose of|for the reason that)\b/gi, 'for')
+        .replace(/\b(with regard to|in regard to|with respect to)\b/gi, 'regarding')
+        .replace(/\b(it is important to note that|it should be noted that)\b/gi, '')
+        .replace(/\b(please be advised that|please note that)\b/gi, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+      
+      // Remove redundant phrases
+      shortened = shortened
+        .split('. ')
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 10)
+        .slice(0, Math.ceil(shortened.split('. ').length * 0.7))
+        .join('. ')
+      
+      return {
+        success: true,
+        data: {
+          originalText: text,
+          improvedText: shortened,
+          changes: ['Removed redundancy', 'Condensed phrases', 'Streamlined content']
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to shorten text'
+      }
+    }
+  }
+
+  async makeLonger(text) {
+    try {
+      await delay(1300)
+      
+      // Simulate text expansion with additional details
+      const expansions = [
+        ' This process is designed to ensure compliance with applicable regulations and industry best practices.',
+        ' We take this matter seriously and have implemented comprehensive measures to address all relevant concerns.',
+        ' Our commitment to transparency means we continuously review and update our procedures as needed.',
+        ' These guidelines are in accordance with current legal requirements and regulatory standards.',
+        ' We maintain detailed records of all such activities to ensure full accountability and traceability.'
+      ]
+      
+      let expanded = text
+      const sentences = expanded.split('. ')
+      
+      // Add random expansions to sentences
+      const expandedSentences = sentences.map(sentence => {
+        if (sentence.trim().length > 20 && Math.random() > 0.6) {
+          const randomExpansion = expansions[Math.floor(Math.random() * expansions.length)]
+          return sentence + randomExpansion
+        }
+        return sentence
+      })
+      
+      expanded = expandedSentences.join('. ')
+      
+      // Add clarifying phrases
+      expanded = expanded
+        .replace(/\b(we|our company)\b/gi, 'we, as a responsible organization,')
+        .replace(/\b(data|information)\b/gi, 'data and related information')
+        .replace(/\b(users|customers)\b/gi, 'users and valued customers')
+      
+      return {
+        success: true,
+        data: {
+          originalText: text,
+          improvedText: expanded,
+          changes: ['Added detail', 'Enhanced explanations', 'Provided context']
+        }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to expand text'
+      }
+    }
+  }
 }
 
 export const policyService = new PolicyService()
-export default policyService

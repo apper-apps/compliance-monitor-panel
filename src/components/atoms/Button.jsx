@@ -12,13 +12,14 @@ const Button = ({
 }) => {
   const baseClasses = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
   
-  const variants = {
+const variants = {
     primary: "btn-primary focus:ring-primary",
     secondary: "btn-secondary focus:ring-primary",
     success: "btn-success focus:ring-success",
     outline: "border-2 border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50",
     ghost: "text-gray-700 hover:bg-gray-100",
-    danger: "bg-error text-white hover:bg-red-600 shadow-lg hover:shadow-xl"
+    danger: "bg-error text-white hover:bg-red-600 shadow-lg hover:shadow-xl",
+    ai: "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl"
   }
   
   const sizes = {
