@@ -1,0 +1,26 @@
+{
+  "overview": {
+    "userName": "John Doe",
+    "totalClients": 12,
+    "activePolicies": 8,
+    "deployedWidgets": 15,
+    "monthlyRevenue": 2340,
+    "complianceScore": 95,
+    "widgetImpressions": 45678,
+    "dataRequests": 23,
+    "alerts": [
+      {
+        "Id": 1,
+        "message": "New GDPR regulation update available",
+        "type": "info",
+        "timestamp": "2 hours ago"
+      },
+      {
+        "Id": 2,
+        "message": "Client approval required for TechCorp policy",
+        "type": "warning",
+        "timestamp": "4 hours ago"
+      }
+    ]
+  }
+}

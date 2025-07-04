@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 1,
+    "title": "GDPR Privacy Policy",
+    "description": "Comprehensive privacy policy for EU compliance",
+    "type": "privacy-policy",
+    "status": "active",
+    "lastUpdated": "2024-03-15T10:30:00Z",
+    "businessName": "TechCorp Solutions",
+    "businessType": "saas",
+    "businessWebsite": "https://techcorp.com",
+    "businessCountry": "us",
+    "contactEmail": "privacy@techcorp.com",
+    "websites": ["https://techcorp.com", "https://app.techcorp.com"]
+  },
+  {
+    "Id": 2,
+    "title": "Cookie Policy",
+    "description": "Detailed cookie usage and tracking policy",
+    "type": "cookie-policy",
+    "status": "active",
+    "lastUpdated": "2024-03-14T14:20:00Z",
+    "businessName": "E-Shop Inc",
+    "businessType": "ecommerce",
+    "businessWebsite": "https://eshop.com",
+    "businessCountry": "ca",
+    "contactEmail": "legal@eshop.com",
+    "websites": ["https://eshop.com"]
+  },
+  {
+    "Id": 3,
+    "title": "Terms of Service",
+    "description": "Standard terms and conditions template",
+    "type": "terms-of-service",
+    "status": "draft",
+    "lastUpdated": "2024-03-13T09:15:00Z",
+    "businessName": "Creative Agency",
+    "businessType": "agency",
+    "businessWebsite": "https://creative.agency",
+    "businessCountry": "uk",
+    "contactEmail": "info@creative.agency",
+    "websites": ["https://creative.agency"]
+  },
+  {
+    "Id": 4,
+    "title": "CCPA Privacy Notice",
+    "description": "California consumer privacy compliance",
+    "type": "ccpa-compliance",
+    "status": "active",
+    "lastUpdated": "2024-03-12T16:45:00Z",
+    "businessName": "California Startup",
+    "businessType": "startup",
+    "businessWebsite": "https://castartup.com",
+    "businessCountry": "us",
+    "contactEmail": "privacy@castartup.com",
+    "websites": ["https://castartup.com"]
+  },
+  {
+    "Id": 5,
+    "title": "Data Processing Agreement",
+    "description": "GDPR compliant data processing terms",
+    "type": "gdpr-compliance",
+    "status": "inactive",
+    "lastUpdated": "2024-03-11T11:30:00Z",
+    "businessName": "DataFlow Ltd",
+    "businessType": "corporate",
+    "businessWebsite": "https://dataflow.com",
+    "businessCountry": "de",
+    "contactEmail": "dpo@dataflow.com",
+    "websites": ["https://dataflow.com"]
+  }
+]
