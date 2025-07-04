@@ -1,18 +1,25 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { toast } from 'react-toastify'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import SearchBar from '@/components/molecules/SearchBar'
-import PolicyCard from '@/components/molecules/PolicyCard'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import policyService from '@/services/api/policyService'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import PolicyCard from "@/components/molecules/PolicyCard";
+import SearchBar from "@/components/molecules/SearchBar";
+import policyService from "@/services/api/policyService";
+
+const filterOptions = [
+  { value: 'all', label: 'All' },
+  { value: 'active', label: 'Active' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'archived', label: 'Archived' }
+];
 
 const Policies = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [policies, setPolicies] = useState([])
   const [filteredPolicies, setFilteredPolicies] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,22 +27,14 @@ const Policies = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
 
-  const filterOptions = [
-    { value: 'all', label: 'All Policies' },
-    { value: 'active', label: 'Active' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'inactive', label: 'Inactive' }
-  ]
-
   useEffect(() => {
     loadPolicies()
   }, [])
 
-  useEffect(() => {
+useEffect(() => {
     filterPolicies()
-  }, [policies, searchTerm, selectedFilter])
-
-  const loadPolicies = async () => {
+  }, [policies, selectedFilter, searchTerm])
+const loadPolicies = async () => {
     try {
       setError(null)
       setLoading(true)
@@ -48,20 +47,26 @@ const Policies = () => {
     }
   }
 
-  const filterPolicies = () => {
+const filterPolicies = () => {
+    // Ensure policies is an array before filtering
+    if (!Array.isArray(policies)) {
+      setFilteredPolicies([])
+      return
+    }
+
     let filtered = policies
 
     // Filter by status
     if (selectedFilter !== 'all') {
-      filtered = filtered.filter(policy => policy.status === selectedFilter)
+      filtered = filtered.filter(policy => policy?.status === selectedFilter)
     }
 
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(policy =>
-        policy.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        policy.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        policy.type.toLowerCase().includes(searchTerm.toLowerCase())
+        policy?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        policy?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        policy?.type?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
