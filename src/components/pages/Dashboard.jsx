@@ -1,50 +1,81 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import StatsCard from '@/components/molecules/StatsCard'
-import PolicyCard from '@/components/molecules/PolicyCard'
-import WidgetCard from '@/components/molecules/WidgetCard'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import dashboardService from '@/services/api/dashboardService'
-import policyService from '@/services/api/policyService'
-import widgetService from '@/services/api/widgetService'
-
-const Dashboard = () => {
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import Policies from "@/components/pages/Policies";
+import Widgets from "@/components/pages/Widgets";
+import PolicyCard from "@/components/molecules/PolicyCard";
+import StatsCard from "@/components/molecules/StatsCard";
+import WidgetCard from "@/components/molecules/WidgetCard";
+import policyService from "@/services/api/policyService";
+import dashboardService from "@/services/api/dashboardService";
+import widgetService from "@/services/api/widgetService";
+function Dashboard() {
   const navigate = useNavigate()
+  const userRole = 'agency' // This would come from auth context
+  
   const [dashboardData, setDashboardData] = useState(null)
   const [recentPolicies, setRecentPolicies] = useState([])
   const [recentWidgets, setRecentWidgets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [userRole] = useState('agency') // This would come from auth context
-
+  const [policiesLoading, setPoliciesLoading] = useState(false)
+  const [widgetsLoading, setWidgetsLoading] = useState(false)
+  
   useEffect(() => {
     loadDashboardData()
   }, [])
-
+  
   const loadDashboardData = async () => {
     try {
-      setError(null)
       setLoading(true)
+      setError(null)
       
-      const [dashboard, policies, widgets] = await Promise.all([
-        dashboardService.getOverview(),
-        policyService.getRecent(),
-        widgetService.getRecent()
+      const [dashboardResponse, policiesResponse, widgetsResponse] = await Promise.all([
+        dashboardService.getStats(),
+        policyService.getRecentPolicies(),
+        widgetService.getRecentWidgets()
       ])
       
-      setDashboardData(dashboard)
-      setRecentPolicies(policies)
-      setRecentWidgets(widgets)
-    } catch (err) {
-      setError(err.message)
+      // Handle dashboard stats
+      if (dashboardResponse?.success) {
+        setDashboardData(dashboardResponse.data)
+      } else {
+        console.error('Failed to load dashboard stats:', dashboardResponse?.error)
+      }
+      
+      // Handle recent policies - extract data from response
+      if (policiesResponse?.success && Array.isArray(policiesResponse.data)) {
+        setRecentPolicies(policiesResponse.data)
+      } else if (Array.isArray(policiesResponse)) {
+        // Fallback for direct array response
+        setRecentPolicies(policiesResponse)
+      } else {
+        console.error('Failed to load recent policies:', policiesResponse?.error)
+        setRecentPolicies([])
+      }
+      
+      // Handle recent widgets - extract data from response
+      if (widgetsResponse?.success && Array.isArray(widgetsResponse.data)) {
+        setRecentWidgets(widgetsResponse.data)
+      } else if (Array.isArray(widgetsResponse)) {
+        // Fallback for direct array response
+        setRecentWidgets(widgetsResponse)
+      } else {
+        console.error('Failed to load recent widgets:', widgetsResponse?.error)
+        setRecentWidgets([])
+      }
+      
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error)
+      setError(error.message || 'Failed to load dashboard data')
     } finally {
       setLoading(false)
-    }
+}
   }
 
   const handleCreatePolicy = () => {
@@ -226,7 +257,7 @@ const Dashboard = () => {
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Policies */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+<div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Recent Policies</h3>
             <Button
@@ -235,26 +266,24 @@ const Dashboard = () => {
               onClick={() => navigate('/policies')}
             >
               View All
-              <ApperIcon name="ChevronRight" className="h-4 w-4 ml-1" />
             </Button>
           </div>
           
           <div className="space-y-4">
-            {recentPolicies.length === 0 ? (
-              <Empty
-                title="No policies yet"
-                description="Create your first privacy policy to get started"
-                actionLabel="Create Policy"
-                onAction={handleCreatePolicy}
-                icon="FileText"
-              />
+            {loading || policiesLoading ? (
+              <Loading />
+            ) : error ? (
+              <Error message="Failed to load recent policies" />
+            ) : !Array.isArray(recentPolicies) || recentPolicies.length === 0 ? (
+              <Empty message="No recent policies available" />
             ) : (
               recentPolicies.slice(0, 3).map((policy) => (
                 <PolicyCard
-                  key={policy.Id}
+                  key={policy.id}
                   policy={policy}
                   onEdit={handlePolicyEdit}
-                  className="shadow-sm"
+                  showActions={false}
+                  className="mb-4 last:mb-0"
                 />
               ))
             )}
@@ -271,26 +300,24 @@ const Dashboard = () => {
               onClick={() => navigate('/widgets')}
             >
               View All
-              <ApperIcon name="ChevronRight" className="h-4 w-4 ml-1" />
             </Button>
           </div>
           
           <div className="space-y-4">
-            {recentWidgets.length === 0 ? (
-              <Empty
-                title="No widgets yet"
-                description="Deploy your first compliance widget"
-                actionLabel="Deploy Widget"
-                onAction={handleCreateWidget}
-                icon="Layout"
-              />
+            {loading || widgetsLoading ? (
+              <Loading />
+            ) : error ? (
+              <Error message="Failed to load recent widgets" />
+            ) : !Array.isArray(recentWidgets) || recentWidgets.length === 0 ? (
+              <Empty message="No recent widgets available" />
             ) : (
               recentWidgets.slice(0, 3).map((widget) => (
                 <WidgetCard
-                  key={widget.Id}
+                  key={widget.id}
                   widget={widget}
                   onEdit={handleWidgetEdit}
-                  className="shadow-sm"
+                  showActions={false}
+                  variant="compact"
                 />
               ))
             )}
