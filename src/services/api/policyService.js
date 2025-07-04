@@ -217,7 +217,7 @@ class PolicyService {
   }
 
   // Standard API methods for component compatibility
-  async getAll(filters = {}) {
+async getAll(filters = {}) {
     return this.getPolicies(filters)
   }
 
@@ -234,6 +234,11 @@ class PolicyService {
       }
     }
     return result
+  }
+
+  // Alias method for Dashboard component compatibility
+  async getRecentPolicies(limit = 5) {
+    return this.getRecent(limit)
   }
 }
 
