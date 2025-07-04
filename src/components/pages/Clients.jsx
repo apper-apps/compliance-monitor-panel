@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { toast } from 'react-toastify'
-import ApperIcon from '@/components/ApperIcon'
-import Button from '@/components/atoms/Button'
-import SearchBar from '@/components/molecules/SearchBar'
-import ClientCard from '@/components/molecules/ClientCard'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import clientService from '@/services/api/clientService'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import Policies from "@/components/pages/Policies";
+import SearchBar from "@/components/molecules/SearchBar";
+import ClientCard from "@/components/molecules/ClientCard";
+import dashboardData from "@/services/mockData/dashboardData.json";
+import policiesData from "@/services/mockData/policies.json";
+import clientService from "@/services/api/clientService";
 
 const Clients = () => {
   const navigate = useNavigate()
@@ -35,33 +38,44 @@ const Clients = () => {
     filterClients()
   }, [clients, searchTerm, selectedFilter])
 
-  const loadClients = async () => {
+const loadClients = async () => {
     try {
       setError(null)
       setLoading(true)
       const data = await clientService.getAll()
-      setClients(data)
+      
+      // Ensure data is always an array
+      const clientsArray = Array.isArray(data) ? data : 
+                          (data?.data && Array.isArray(data.data)) ? data.data : 
+                          []
+      
+      setClients(clientsArray)
     } catch (err) {
       setError(err.message)
+      setClients([]) // Ensure clients is always an array on error
     } finally {
       setLoading(false)
     }
   }
 
   const filterClients = () => {
-    let filtered = clients
+    // Ensure clients is always an array before filtering
+    const clientsArray = Array.isArray(clients) ? clients : []
+    let filtered = clientsArray
 
     // Filter by status
     if (selectedFilter !== 'all') {
-      filtered = filtered.filter(client => client.status === selectedFilter)
+      filtered = filtered.filter(client => 
+        client?.status === selectedFilter
+      )
     }
 
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(client =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.website.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email.toLowerCase().includes(searchTerm.toLowerCase())
+        client?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client?.website?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client?.email?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
