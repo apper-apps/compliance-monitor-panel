@@ -27,13 +27,12 @@ const Policies = () => {
   const [filteredPolicies, setFilteredPolicies] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
+const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
 
-useEffect(() => {
+  useEffect(() => {
     loadPolicies()
   }, []);
-
   useEffect(() => {
     filterPolicies()
   }, [policies, selectedFilter, searchTerm]);
