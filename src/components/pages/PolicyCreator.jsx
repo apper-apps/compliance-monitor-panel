@@ -76,12 +76,28 @@ const [policyData, setPolicyData] = useState({
     }
   }, [])
 
-  const loadPolicy = async () => {
+const loadPolicy = async () => {
     try {
       setError(null)
       setLoading(true)
       const policy = await policyService.getById(parseInt(id))
-      setPolicyData(policy)
+      
+      // Validate policy structure to prevent runtime errors
+      if (!policy || typeof policy !== 'object') {
+        throw new Error('Invalid policy data received')
+      }
+      
+      // Ensure all required properties exist with defaults
+      const validatedPolicy = {
+        title: policy.title || '',
+        type: policy.type || 'privacy-policy',
+        content: policy.content || '',
+        status: policy.status || 'draft',
+        lastUpdated: policy.lastUpdated || new Date().toISOString(),
+        ...policy
+      }
+      
+      setPolicyData(validatedPolicy)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -284,8 +300,8 @@ const [policyData, setPolicyData] = useState({
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-500">
-              {policyData.content.length} characters • Select text to see AI writing tools
+<div className="text-sm text-gray-500">
+              {policyData?.content?.length || 0} characters • Select text to see AI writing tools
             </div>
           </div>
           
