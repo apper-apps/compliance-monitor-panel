@@ -344,18 +344,11 @@ const clientIndex = clients.findIndex(c => c.id === id);
       
       clients[clientIndex] = updatedClient;
       
-      const result = {
+return {
         success: true,
         data: updatedClient,
         message: 'Client activated successfully'
       };
-      })
-      
-      if (result.success) {
-        result.message = 'Client activated successfully'
-      }
-      
-      return result
     } catch (error) {
       return {
         success: false,
@@ -386,27 +379,18 @@ const clientIndex = clients.findIndex(c => c.id === id);
       
       clients[clientIndex] = updatedClient;
       
-      const result = {
+return {
         success: true,
         data: updatedClient,
         message: 'Client deactivated successfully'
       };
-      })
-      
-      if (result.success) {
-        result.message = 'Client deactivated successfully'
-      }
-      
-      return result
     } catch (error) {
       return {
         success: false,
         error: error.message || 'Failed to deactivate client'
       }
     }
-  }
 }
-
 }
 
 export const clientService = new ClientService();
