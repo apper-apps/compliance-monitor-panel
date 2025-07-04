@@ -7,7 +7,7 @@ import Button from '@/components/atoms/Button'
 import FormField from '@/components/molecules/FormField'
 import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
-import { widgetService } from '@/services/api/widgetService'
+import widgetService from '@/services/api/widgetService'
 
 const WidgetBuilder = () => {
   const navigate = useNavigate()

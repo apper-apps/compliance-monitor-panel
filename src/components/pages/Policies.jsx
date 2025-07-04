@@ -9,7 +9,7 @@ import PolicyCard from '@/components/molecules/PolicyCard'
 import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
 import Empty from '@/components/ui/Empty'
-import { policyService } from '@/services/api/policyService'
+import policyService from '@/services/api/policyService'
 
 const Policies = () => {
   const navigate = useNavigate()

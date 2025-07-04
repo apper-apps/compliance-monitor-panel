@@ -11,7 +11,7 @@ import WidgetCard from '@/components/molecules/WidgetCard'
 import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
 import Empty from '@/components/ui/Empty'
-import { clientService } from '@/services/api/clientService'
+import clientService from '@/services/api/clientService'
 
 const ClientDetails = () => {
   const { id } = useParams()

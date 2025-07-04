@@ -9,9 +9,9 @@ import WidgetCard from '@/components/molecules/WidgetCard'
 import Loading from '@/components/ui/Loading'
 import Error from '@/components/ui/Error'
 import Empty from '@/components/ui/Empty'
-import { dashboardService } from '@/services/api/dashboardService'
-import { policyService } from '@/services/api/policyService'
-import { widgetService } from '@/services/api/widgetService'
+import dashboardService from '@/services/api/dashboardService'
+import policyService from '@/services/api/policyService'
+import widgetService from '@/services/api/widgetService'
 
 const Dashboard = () => {
   const navigate = useNavigate()
