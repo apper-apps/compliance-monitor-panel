@@ -9,8 +9,9 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState('account')
   const [loading, setLoading] = useState(false)
 
-  const tabs = [
+const tabs = [
     { id: 'account', label: 'Account', icon: 'User' },
+    { id: 'workspaces', label: 'Workspaces', icon: 'Building' },
     { id: 'billing', label: 'Billing', icon: 'CreditCard' },
     { id: 'notifications', label: 'Notifications', icon: 'Bell' },
     { id: 'integrations', label: 'Integrations', icon: 'Link' },
@@ -47,13 +48,44 @@ const Settings = () => {
     }
   })
 
-  const [securitySettings, setSecuritySettings] = useState({
+const [securitySettings, setSecuritySettings] = useState({
     twoFactorAuth: true,
     sessionTimeout: 30,
     ipWhitelist: '',
     apiKeyRotation: 'monthly'
   })
 
+  const [workspaces, setWorkspaces] = useState([
+    { 
+      Id: 1, 
+      name: 'Production Website', 
+      domain: 'mycompany.com', 
+      customDomain: 'privacy.mycompany.com',
+      cnameStatus: 'verified',
+      isActive: true,
+      createdAt: '2024-01-15',
+      brandLogo: null
+    },
+    { 
+      Id: 2, 
+      name: 'Development Site', 
+      domain: 'dev.mycompany.com', 
+      customDomain: 'privacy-dev.mycompany.com',
+      cnameStatus: 'pending',
+      isActive: false,
+      createdAt: '2024-02-01',
+      brandLogo: null
+    }
+  ])
+
+  const [brandLogo, setBrandLogo] = useState(null)
+  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false)
+  const [editingWorkspace, setEditingWorkspace] = useState(null)
+  const [workspaceForm, setWorkspaceForm] = useState({
+    name: '',
+    domain: '',
+    customDomain: ''
+  })
   const handleSave = async () => {
     setLoading(true)
     // Simulate API call
@@ -79,8 +111,116 @@ const Settings = () => {
 
   const handleSecurityChange = (field, value) => {
     setSecuritySettings(prev => ({ ...prev, [field]: value }))
+}
+
+  const handleWorkspaceCreate = async () => {
+    if (!workspaceForm.name || !workspaceForm.domain) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setLoading(true)
+    setTimeout(() => {
+      const newWorkspace = {
+        Id: Math.max(...workspaces.map(w => w.Id)) + 1,
+        name: workspaceForm.name,
+        domain: workspaceForm.domain,
+        customDomain: workspaceForm.customDomain || '',
+        cnameStatus: workspaceForm.customDomain ? 'pending' : 'none',
+        isActive: false,
+        createdAt: new Date().toISOString().split('T')[0],
+        brandLogo: null
+      }
+      setWorkspaces(prev => [...prev, newWorkspace])
+      setWorkspaceForm({ name: '', domain: '', customDomain: '' })
+      setShowWorkspaceModal(false)
+      setLoading(false)
+      toast.success('Workspace created successfully')
+    }, 800)
   }
 
+  const handleWorkspaceEdit = (workspace) => {
+    setEditingWorkspace(workspace)
+    setWorkspaceForm({
+      name: workspace.name,
+      domain: workspace.domain,
+      customDomain: workspace.customDomain
+    })
+    setShowWorkspaceModal(true)
+  }
+
+  const handleWorkspaceUpdate = async () => {
+    if (!workspaceForm.name || !workspaceForm.domain) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setLoading(true)
+    setTimeout(() => {
+      setWorkspaces(prev => prev.map(w => 
+        w.Id === editingWorkspace.Id 
+          ? { 
+              ...w, 
+              name: workspaceForm.name,
+              domain: workspaceForm.domain,
+              customDomain: workspaceForm.customDomain,
+              cnameStatus: workspaceForm.customDomain && workspaceForm.customDomain !== w.customDomain ? 'pending' : w.cnameStatus
+            }
+          : w
+      ))
+      setWorkspaceForm({ name: '', domain: '', customDomain: '' })
+      setEditingWorkspace(null)
+      setShowWorkspaceModal(false)
+      setLoading(false)
+      toast.success('Workspace updated successfully')
+    }, 800)
+  }
+
+  const handleWorkspaceDelete = async (workspaceId) => {
+    if (!confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
+      return
+    }
+
+    setLoading(true)
+    setTimeout(() => {
+      setWorkspaces(prev => prev.filter(w => w.Id !== workspaceId))
+      setLoading(false)
+      toast.success('Workspace deleted successfully')
+    }, 500)
+  }
+
+  const handleWorkspaceToggle = async (workspaceId) => {
+    setLoading(true)
+    setTimeout(() => {
+      setWorkspaces(prev => prev.map(w => 
+        w.Id === workspaceId 
+          ? { ...w, isActive: !w.isActive }
+          : w
+      ))
+      setLoading(false)
+      toast.success('Workspace status updated')
+    }, 500)
+  }
+
+  const handleBrandLogoUpload = () => {
+    // Simulate file upload
+    toast.success('Brand logo uploaded successfully')
+    setBrandLogo('https://via.placeholder.com/64x64/2563EB/ffffff?text=LOGO')
+  }
+
+  const verifyCNAME = async (workspaceId) => {
+    setLoading(true)
+    setTimeout(() => {
+      setWorkspaces(prev => prev.map(w => 
+        w.Id === workspaceId 
+          ? { ...w, cnameStatus: Math.random() > 0.5 ? 'verified' : 'failed' }
+          : w
+      ))
+      setLoading(false)
+      const workspace = workspaces.find(w => w.Id === workspaceId)
+      toast.success(`CNAME verification completed for ${workspace?.name}`)
+    }, 1500)
+  }
   const renderTabContent = () => {
     switch (activeTab) {
       case 'account':
@@ -134,7 +274,7 @@ const Settings = () => {
               </div>
             </div>
 
-            <div>
+<div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Profile Picture
               </h3>
@@ -149,6 +289,30 @@ const Settings = () => {
                   </Button>
                   <p className="text-sm text-gray-500 mt-1">
                     JPG, PNG or GIF. Maximum file size 2MB.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Brand Logo
+              </h3>
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                  {brandLogo ? (
+                    <img src={brandLogo} alt="Brand Logo" className="w-full h-full object-contain rounded-lg" />
+                  ) : (
+                    <ApperIcon name="Image" className="h-8 w-8 text-gray-400" />
+                  )}
+                </div>
+                <div>
+                  <Button variant="outline" size="sm" onClick={handleBrandLogoUpload}>
+                    <ApperIcon name="Upload" className="h-4 w-4 mr-2" />
+                    {brandLogo ? 'Change Logo' : 'Upload Logo'}
+                  </Button>
+                  <p className="text-sm text-gray-500 mt-1">
+                    PNG or SVG recommended. Maximum file size 1MB.
                   </p>
                 </div>
               </div>
@@ -618,6 +782,192 @@ const Settings = () => {
                 </div>
               </div>
             </div>
+          </div>
+)
+
+      case 'workspaces':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Workspace Management
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Manage your workspaces and custom domain configurations
+                </p>
+              </div>
+              <Button 
+                variant="primary" 
+                size="sm"
+                onClick={() => {
+                  setEditingWorkspace(null)
+                  setWorkspaceForm({ name: '', domain: '', customDomain: '' })
+                  setShowWorkspaceModal(true)
+                }}
+              >
+                <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
+                Add Workspace
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {workspaces.map((workspace) => (
+                <div key={workspace.Id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        workspace.isActive ? 'bg-success text-white' : 'bg-gray-200 text-gray-600'
+                      }`}>
+                        <ApperIcon name="Building" className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900">{workspace.name}</h4>
+                        <p className="text-sm text-gray-500">{workspace.domain}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleWorkspaceToggle(workspace.Id)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          workspace.isActive 
+                            ? 'bg-success/10 text-success' 
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {workspace.isActive ? 'Active' : 'Inactive'}
+                      </button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleWorkspaceEdit(workspace)}
+                      >
+                        <ApperIcon name="Edit" className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleWorkspaceDelete(workspace.Id)}
+                      >
+                        <ApperIcon name="Trash2" className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {workspace.customDomain && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h5 className="font-medium text-gray-900">Custom Domain (CNAME)</h5>
+                          <p className="text-sm text-gray-600 font-mono">{workspace.customDomain}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Point your CNAME record to: <span className="font-mono">widgets.compliancehub.io</span>
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            workspace.cnameStatus === 'verified' 
+                              ? 'bg-success/10 text-success'
+                              : workspace.cnameStatus === 'pending'
+                              ? 'bg-warning/10 text-warning'
+                              : 'bg-error/10 text-error'
+                          }`}>
+                            {workspace.cnameStatus.charAt(0).toUpperCase() + workspace.cnameStatus.slice(1)}
+                          </span>
+                          {workspace.cnameStatus !== 'verified' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => verifyCNAME(workspace.Id)}
+                            >
+                              <ApperIcon name="RefreshCw" className="h-4 w-4 mr-1" />
+                              Verify
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Workspace Modal */}
+            {showWorkspaceModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {editingWorkspace ? 'Edit Workspace' : 'Create Workspace'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setShowWorkspaceModal(false)
+                        setEditingWorkspace(null)
+                        setWorkspaceForm({ name: '', domain: '', customDomain: '' })
+                      }}
+                      className="p-2 rounded-lg hover:bg-gray-100"
+                    >
+                      <ApperIcon name="X" className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    <FormField
+                      label="Workspace Name"
+                      value={workspaceForm.name}
+                      onChange={(e) => setWorkspaceForm(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="e.g., Production Website"
+                    />
+                    <FormField
+                      label="Primary Domain"
+                      value={workspaceForm.domain}
+                      onChange={(e) => setWorkspaceForm(prev => ({ ...prev, domain: e.target.value }))}
+                      placeholder="e.g., mycompany.com"
+                    />
+                    <FormField
+                      label="Custom Domain (CNAME) - Optional"
+                      value={workspaceForm.customDomain}
+                      onChange={(e) => setWorkspaceForm(prev => ({ ...prev, customDomain: e.target.value }))}
+                      placeholder="e.g., privacy.mycompany.com"
+                    />
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start space-x-2">
+                        <ApperIcon name="Info" className="h-4 w-4 text-blue-600 mt-0.5" />
+                        <div className="text-sm text-blue-700">
+                          <p className="font-medium">CNAME Setup Instructions:</p>
+                          <p className="text-xs mt-1">
+                            Create a CNAME record pointing your custom domain to: 
+                            <span className="font-mono bg-blue-100 px-1 rounded ml-1">widgets.compliancehub.io</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowWorkspaceModal(false)
+                        setEditingWorkspace(null)
+                        setWorkspaceForm({ name: '', domain: '', customDomain: '' })
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={editingWorkspace ? handleWorkspaceUpdate : handleWorkspaceCreate}
+                      loading={loading}
+                      disabled={loading}
+                    >
+                      {editingWorkspace ? 'Update' : 'Create'} Workspace
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )
 
