@@ -44,9 +44,9 @@ class PolicyService {
         error: error.message || 'Failed to fetch policies'
       }
     }
-  }
+}
 
-async getPolicy(id) {
+  async getPolicy(id) {
     try {
       await delay(300)
       
@@ -66,9 +66,9 @@ async getPolicy(id) {
         error: error.message || 'Failed to fetch policy'
       }
     }
-  }
+}
 
-async createPolicy(policyData) {
+  async createPolicy(policyData) {
     try {
       await delay(800)
       
@@ -100,9 +100,9 @@ async createPolicy(policyData) {
         error: error.message || 'Failed to create policy'
       }
     }
-  }
+}
 
-async updatePolicy(id, updateData) {
+  async updatePolicy(id, updateData) {
     try {
       await delay(600)
       
@@ -133,9 +133,9 @@ async updatePolicy(id, updateData) {
         error: error.message || 'Failed to update policy'
       }
     }
-  }
+}
 
-async deletePolicy(id, updateData) {
+  async deletePolicy(id, updateData) {
     try {
       await delay(400)
       
@@ -184,17 +184,17 @@ async deletePolicy(id, updateData) {
 
   async duplicatePolicy(id) {
     try {
-      await delay(400)
+await delay(400)
       
-const originalPolicy = policies.find(p => p.Id === parseInt(id))
+      const originalPolicy = policies.find(p => p.Id === parseInt(id))
       
       if (!originalPolicy) {
         throw new Error('Policy not found')
       }
       
-      const duplicatedPolicy = {
+const duplicatedPolicy = {
         ...originalPolicy,
-Id: Math.max(...policies.map(p => p.Id), 0) + 1,
+        Id: Math.max(...policies.map(p => p.Id), 0) + 1,
         name: `${originalPolicy.name} (Copy)`,
         status: 'draft',
         createdAt: new Date().toISOString(),
@@ -287,9 +287,8 @@ Id: Math.max(...policies.map(p => p.Id), 0) + 1,
 
   // Alias method for Dashboard component compatibility
   async getRecentPolicies(limit = 5) {
-    return this.getRecent(limit)
+return this.getRecent(limit)
   }
-}
 
   // Geolocation and policy recommendation methods
   async detectUserCountry() {
@@ -430,14 +429,11 @@ Id: Math.max(...policies.map(p => p.Id), 0) + 1,
       
       // Australia - Privacy Act
       'au': ['privacy-act-australia'],
-      
-      // Brazil - LGPD
+// Brazil - LGPD
       'br': ['lgpd-brazil']
     }
 
     return countryToRegulations[countryCode] || ['privacy-policy']
-  }
-return countryToRegulations[countryCode] || ['privacy-policy']
   }
 
   // AI Text Processing Methods
