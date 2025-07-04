@@ -296,8 +296,10 @@ onView={handleViewPolicy}
             </div>
           </div>
         </div>
+</div>
       )}
     </div>
-  )
+  );
+};
 
-export default Policies
+export default Policies;
