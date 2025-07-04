@@ -73,9 +73,9 @@ function Dashboard() {
     } catch (error) {
       console.error('Failed to load dashboard data:', error)
       setError(error.message || 'Failed to load dashboard data')
-    } finally {
+} finally {
       setLoading(false)
-}
+    }
   }
 
   const handleCreatePolicy = () => {
@@ -239,7 +239,17 @@ function Dashboard() {
             className="flex-col space-y-2 h-auto py-6"
           >
             <ApperIcon name="FileText" className="h-8 w-8" />
-            <span>View Policies</span>
+<span>View Policies</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => navigate('/ai-assistant')}
+            className="flex-col space-y-2 h-auto py-6"
+          >
+            <ApperIcon name="MessageCircle" className="h-8 w-8" />
+            <span>AI Assistant</span>
           </Button>
           
           <Button
@@ -251,13 +261,12 @@ function Dashboard() {
             <ApperIcon name="HelpCircle" className="h-8 w-8" />
             <span>Get Help</span>
           </Button>
-        </div>
+</div>
       </div>
-
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Policies */}
-<div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Recent Policies</h3>
             <Button

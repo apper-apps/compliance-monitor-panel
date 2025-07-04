@@ -7,13 +7,14 @@ const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation()
   const [userRole] = useState('agency') // This would come from auth context
 
-  const menuItems = [
+const menuItems = [
     { path: '/', label: 'Dashboard', icon: 'LayoutDashboard' },
     { path: '/policies', label: 'Policies', icon: 'Shield' },
     { path: '/widgets', label: 'Widgets', icon: 'Layout' },
     ...(userRole === 'agency' ? [
       { path: '/clients', label: 'Clients', icon: 'Users' }
     ] : []),
+    { path: '/ai-assistant', label: 'AI Assistant', icon: 'MessageCircle' },
     { path: '/settings', label: 'Settings', icon: 'Settings' },
     { path: '/support', label: 'Support', icon: 'HelpCircle' }
   ]
