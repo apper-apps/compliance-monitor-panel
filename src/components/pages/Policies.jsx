@@ -191,13 +191,12 @@ const [searchTerm, setSearchTerm] = useState('')
           ))}
         </div>
       )}
+)}
 
       {/* Policy Templates */}
-{/* Policy Templates */}
       {policies.length === 0 && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            GDPR & Privacy Compliance Templates
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
