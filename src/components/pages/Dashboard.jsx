@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import Empty from "@/components/ui/Empty";
 import Error from "@/components/ui/Error";
@@ -11,155 +13,151 @@ import Widgets from "@/components/pages/Widgets";
 import PolicyCard from "@/components/molecules/PolicyCard";
 import StatsCard from "@/components/molecules/StatsCard";
 import WidgetCard from "@/components/molecules/WidgetCard";
-import Badge from "@/components/atoms/Badge";
-import { toast } from "react-toastify";
-import policyService from "@/services/api/policyService";
-import dashboardService from "@/services/api/dashboardService";
-import widgetService from "@/services/api/widgetService";
-function Dashboard() {
-  const navigate = useNavigate()
-  const userRole = 'agency' // This would come from auth context
+import { policyService } from "@/services/api/policyService";
+import { dashboardService } from "@/services/api/dashboardService";
+import { widgetService } from "@/services/api/widgetService";
+
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const userRole = 'agency'; // This would come from auth context
+const [dashboardData, setDashboardData] = useState(null);
+  const [recentPolicies, setRecentPolicies] = useState([]);
+  const [recentWidgets, setRecentWidgets] = useState([]);
+  const [policyAlerts, setPolicyAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [policiesLoading, setPoliciesLoading] = useState(false);
+  const [widgetsLoading, setWidgetsLoading] = useState(false);
+  const [alertsExpanded, setAlertsExpanded] = useState(false);
+useEffect(() => {
+    loadDashboardData();
+  }, []);
   
-const [dashboardData, setDashboardData] = useState(null)
-  const [recentPolicies, setRecentPolicies] = useState([])
-  const [recentWidgets, setRecentWidgets] = useState([])
-  const [policyAlerts, setPolicyAlerts] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [policiesLoading, setPoliciesLoading] = useState(false)
-  const [widgetsLoading, setWidgetsLoading] = useState(false)
-  const [alertsExpanded, setAlertsExpanded] = useState(false)
-  
-  useEffect(() => {
-    loadDashboardData()
-  }, [])
-  
+  const loadDashboardData = async () => {
 const loadDashboardData = async () => {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
       
       const [dashboardResponse, policiesResponse, widgetsResponse] = await Promise.all([
         dashboardService.getStats(),
         policyService.getRecentPolicies(),
         widgetService.getRecentWidgets()
-      ])
+      ]);
       
       // Handle dashboard stats
       if (dashboardResponse?.success) {
-        setDashboardData(dashboardResponse.data)
+        setDashboardData(dashboardResponse.data);
         // Extract intelligent policy alerts
         if (dashboardResponse.data?.policyAlerts) {
-          setPolicyAlerts(dashboardResponse.data.policyAlerts)
+          setPolicyAlerts(dashboardResponse.data.policyAlerts);
         }
       } else {
-        console.error('Failed to load dashboard stats:', dashboardResponse?.error)
+        console.error('Failed to load dashboard stats:', dashboardResponse?.error);
       }
       
       // Handle recent policies - extract data from response
       if (policiesResponse?.success && Array.isArray(policiesResponse.data)) {
-        setRecentPolicies(policiesResponse.data)
+        setRecentPolicies(policiesResponse.data);
       } else if (Array.isArray(policiesResponse)) {
         // Fallback for direct array response
-        setRecentPolicies(policiesResponse)
+        setRecentPolicies(policiesResponse);
       } else {
-        console.error('Failed to load recent policies:', policiesResponse?.error)
-        setRecentPolicies([])
+        console.error('Failed to load recent policies:', policiesResponse?.error);
+        setRecentPolicies([]);
       }
       
       // Handle recent widgets - extract data from response
       if (widgetsResponse?.success && Array.isArray(widgetsResponse.data)) {
-        setRecentWidgets(widgetsResponse.data)
+        setRecentWidgets(widgetsResponse.data);
       } else if (Array.isArray(widgetsResponse)) {
         // Fallback for direct array response
-        setRecentWidgets(widgetsResponse)
+        setRecentWidgets(widgetsResponse);
       } else {
-        console.error('Failed to load recent widgets:', widgetsResponse?.error)
-        setRecentWidgets([])
+        console.error('Failed to load recent widgets:', widgetsResponse?.error);
+        setRecentWidgets([]);
       }
       
     } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-      setError(error.message || 'Failed to load dashboard data')
+      console.error('Failed to load dashboard data:', error);
+      setError(error.message || 'Failed to load dashboard data');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleAlertAction = async (alert, action) => {
+const handleAlertAction = async (alert, action) => {
     try {
       switch (action) {
         case 'review':
           if (alert.policyId) {
-            navigate(`/policies/${alert.policyId}/edit`)
+            navigate(`/policies/${alert.policyId}/edit`);
           } else {
-            navigate('/policies')
+            navigate('/policies');
           }
-          break
+          break;
         case 'dismiss':
-          setPolicyAlerts(prev => prev.filter(a => a.Id !== alert.Id))
-          toast.success('Alert dismissed')
-          break
+          setPolicyAlerts(prev => prev.filter(a => a.Id !== alert.Id));
+          toast.success('Alert dismissed');
+          break;
         case 'update':
           if (alert.policyId) {
-            navigate(`/policies/${alert.policyId}/edit`)
+            navigate(`/policies/${alert.policyId}/edit`);
           }
-          break
+          break;
         case 'view_all':
-          navigate('/policies?alerts=true')
-          break
+          navigate('/policies?alerts=true');
+          break;
         default:
-          break
+          break;
       }
     } catch (error) {
-      toast.error('Failed to handle alert action')
+      toast.error('Failed to handle alert action');
     }
-  }
+  };
 
-  const getAlertIcon = (type) => {
+const getAlertIcon = (type) => {
     switch (type) {
-      case 'expiring': return 'Clock'
-      case 'regulatory': return 'AlertTriangle'
-      case 'compliance': return 'ShieldAlert'
-      case 'recommendation': return 'Lightbulb'
-      case 'update': return 'RefreshCw'
-      default: return 'Info'
+      case 'expiring': return 'Clock';
+      case 'regulatory': return 'AlertTriangle';
+      case 'compliance': return 'ShieldAlert';
+      case 'recommendation': return 'Lightbulb';
+      case 'update': return 'RefreshCw';
+      default: return 'Info';
     }
-  }
+  };
 
   const getAlertVariant = (priority) => {
     switch (priority) {
-      case 'high': return 'error'
-      case 'medium': return 'warning'
-      case 'low': return 'info'
-      default: return 'info'
+      case 'high': return 'error';
+      case 'medium': return 'warning';
+      case 'low': return 'info';
+      default: return 'info';
     }
-  }
+  };
 
   const handleCreatePolicy = () => {
-    navigate('/policies/create')
-  }
+    navigate('/policies/create');
+  };
 
   const handleCreateWidget = () => {
-    navigate('/widgets/builder')
-  }
+    navigate('/widgets/builder');
+  };
 
   const handlePolicyEdit = (policy) => {
-    navigate(`/policies/${policy.Id}/edit`)
-  }
+    navigate(`/policies/${policy.Id}/edit`);
+  };
 
   const handleWidgetEdit = (widget) => {
-    navigate(`/widgets/${widget.Id}/edit`)
-  }
-
-  if (loading) {
-    return <Loading type="dashboard" />
+    navigate(`/widgets/${widget.Id}/edit`);
+  };
+if (loading) {
+    return <Loading type="dashboard" />;
   }
 
   if (error) {
-    return <Error message={error} onRetry={loadDashboardData} />
+    return <Error message={error} onRetry={loadDashboardData} />;
   }
-
   const getStatsCards = () => {
     if (userRole === 'agency') {
       return [
@@ -223,11 +221,10 @@ const loadDashboardData = async () => {
         changeType: 'positive',
         icon: 'Database'
       }
-    ]
-  }
+];
+  };
 
-  const statsCards = getStatsCards()
-
+  const statsCards = getStatsCards();
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -318,11 +315,11 @@ const loadDashboardData = async () => {
           >
             <ApperIcon name="HelpCircle" className="h-8 w-8" />
             <span>Get Help</span>
-          </Button>
-</div>
+</Button>
+        </div>
       </div>
-      {/* Recent Activity */}
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+{/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Policies */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
@@ -530,8 +527,8 @@ const loadDashboardData = async () => {
           )}
         </div>
       )}
-    </div>
-  )
-}
+</div>
+  );
+};
 
-export default Dashboard
+export default Dashboard;
