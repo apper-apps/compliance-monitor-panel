@@ -1,4 +1,4 @@
-import policiesData from '@/services/mockData/policies.json'
+import policiesData from "@/services/mockData/policies.json";
 
 // Simulate API delay for realistic behavior
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -60,7 +60,7 @@ class PolicyService {
         success: true,
         data: policy
       }
-    } catch (error) {
+} catch (error) {
       return {
         success: false,
         error: error.message || 'Failed to fetch policy'
@@ -214,6 +214,26 @@ class PolicyService {
         error: error.message || 'Failed to duplicate policy'
       }
     }
+  }
+
+  // Standard API methods for component compatibility
+  async getAll(filters = {}) {
+    return this.getPolicies(filters)
+  }
+
+  async getRecent(limit = 5) {
+    const result = await this.getPolicies()
+    if (result.success) {
+      const sortedPolicies = result.data
+        .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
+        .slice(0, limit)
+      return {
+        success: true,
+        data: sortedPolicies,
+        total: sortedPolicies.length
+      }
+    }
+    return result
   }
 }
 

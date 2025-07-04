@@ -1,5 +1,5 @@
 // Simulate API delay for realistic behavior
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Mock client data (simulates database)
 let clients = [
@@ -117,7 +117,7 @@ class ClientService {
         data: filteredClients,
         total: filteredClients.length
       }
-    } catch (error) {
+} catch (error) {
       return {
         success: false,
         error: error.message || 'Failed to fetch clients'
@@ -127,12 +127,12 @@ class ClientService {
 
   async getClient(id) {
     try {
-      await delay(300)
+      await delay(300);
       
-      const client = clients.find(c => c.id === id)
+      const client = clients.find(c => c.id === id);
       
       if (!client) {
-        throw new Error('Client not found')
+        throw new Error('Client not found');
       }
       
       // Add additional details for client view
@@ -170,17 +170,46 @@ class ClientService {
             lastUpdated: '2024-01-14T15:45:00Z'
           }
         ]
-      }
+      };
       
       return {
         success: true,
         data: clientDetails
-      }
+      };
     } catch (error) {
       return {
         success: false,
         error: error.message || 'Failed to fetch client'
+      };
+    }
+  }
+
+  // Standard API methods for component compatibility
+  async getAll(filters = {}) {
+    return this.getClients(filters);
+  }
+
+  async getRecent(limit = 5) {
+    try {
+      const result = await this.getClients();
+      if (!result.success) {
+        return result;
       }
+      
+      const sortedClients = result.data
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, limit);
+      
+      return {
+        success: true,
+        data: sortedClients,
+        total: sortedClients.length
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message || 'Failed to fetch recent clients'
+      };
     }
   }
 
@@ -297,9 +326,29 @@ class ClientService {
     try {
       await delay(500)
       
-      const result = await this.updateClient(id, {
+const clientIndex = clients.findIndex(c => c.id === id);
+      
+      if (clientIndex === -1) {
+        throw new Error('Client not found');
+      }
+      
+      const updatedClient = {
+        ...clients[clientIndex],
         status: 'active',
-        'subscription.status': 'active'
+        subscription: {
+          ...clients[clientIndex].subscription,
+          status: 'active'
+        },
+        lastUpdated: new Date().toISOString()
+      };
+      
+      clients[clientIndex] = updatedClient;
+      
+      const result = {
+        success: true,
+        data: updatedClient,
+        message: 'Client activated successfully'
+      };
       })
       
       if (result.success) {
@@ -319,9 +368,29 @@ class ClientService {
     try {
       await delay(500)
       
-      const result = await this.updateClient(id, {
+const clientIndex = clients.findIndex(c => c.id === id);
+      
+      if (clientIndex === -1) {
+        throw new Error('Client not found');
+      }
+      
+      const updatedClient = {
+        ...clients[clientIndex],
         status: 'inactive',
-        'subscription.status': 'inactive'
+        subscription: {
+          ...clients[clientIndex].subscription,
+          status: 'inactive'
+        },
+        lastUpdated: new Date().toISOString()
+      };
+      
+      clients[clientIndex] = updatedClient;
+      
+      const result = {
+        success: true,
+        data: updatedClient,
+        message: 'Client deactivated successfully'
+      };
       })
       
       if (result.success) {
@@ -338,5 +407,7 @@ class ClientService {
   }
 }
 
-export const clientService = new ClientService()
-export default clientService
+}
+
+export const clientService = new ClientService();
+export default clientService;

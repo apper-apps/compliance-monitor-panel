@@ -122,7 +122,7 @@ class WidgetService {
     }
   }
 
-  async createWidget(widgetData) {
+async createWidget(widgetData) {
     try {
       await delay(800)
       
@@ -133,8 +133,11 @@ class WidgetService {
       
       const newWidget = {
         id: `widget_${Date.now()}`,
-        ...widgetData,
-        status: widgetData.status || 'inactive',
+        name: widgetData.name,
+        type: widgetData.type,
+        status: widgetData.status || 'draft',
+        description: widgetData.description || '',
+        config: widgetData.config || {},
         createdAt: new Date().toISOString(),
         lastUpdated: new Date().toISOString(),
         deployedAt: null
@@ -301,6 +304,24 @@ class WidgetService {
         error: error.message || 'Failed to duplicate widget'
       }
     }
+}
+
+  // Standard API methods for component compatibility
+  async getAll(filters = {}) {
+    return this.getWidgets(filters)
+  }
+
+  async getRecent(limit = 5) {
+    const result = await this.getWidgets()
+    if (result.success) {
+      return {
+        success: true,
+        data: result.data
+          .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
+          .slice(0, limit)
+      }
+    }
+    return result
   }
 }
 
