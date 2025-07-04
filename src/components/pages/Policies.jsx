@@ -185,13 +185,12 @@ const [searchTerm, setSearchTerm] = useState('')
                 policy={policy}
                 onEdit={handleEditPolicy}
                 onDelete={handleDeletePolicy}
-                onView={handleViewPolicy}
+onView={handleViewPolicy}
               />
             </motion.div>
-))}
+          ))}
         </div>
       )}
-
       {/* Policy Templates */}
       {policies.length === 0 && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
