@@ -6,8 +6,8 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
+fontFamily: {
+        'manrope': ['Manrope', 'sans-serif'],
       },
       colors: {
         primary: '#2563EB',
