@@ -17,11 +17,14 @@ const WidgetCard = ({
     inactive: 'default'
   }
 
-  const typeIcons = {
+const typeIcons = {
     'cookie-banner': 'Cookie',
     'privacy-center': 'Shield',
     'consent-form': 'CheckSquare',
-    'preference-center': 'Settings'
+    'preference-center': 'Settings',
+    'hipaa-privacy-notice': 'Heart',
+    'financial-privacy-notice': 'DollarSign',
+    'biometric-data-notice': 'Fingerprint'
   }
 
   return (

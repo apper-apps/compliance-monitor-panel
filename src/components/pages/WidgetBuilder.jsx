@@ -14,11 +14,11 @@ const WidgetBuilder = () => {
   const { id } = useParams()
   const isEditing = Boolean(id)
   
-  const [activeTab, setActiveTab] = useState('type')
+const [activeTab, setActiveTab] = useState('type')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
-  
+  const [showPreview, setShowPreview] = useState(false)
   const [formData, setFormData] = useState({
     // Basic Settings
     name: '',
@@ -86,7 +86,7 @@ const WidgetBuilder = () => {
     { id: 'integration', label: 'Integration', icon: 'Code' }
   ]
 
-  const widgetTypes = [
+const widgetTypes = [
     {
       value: 'cookie-banner',
       label: 'Cookie Banner',
@@ -110,6 +110,24 @@ const WidgetBuilder = () => {
       label: 'Preference Center',
       description: 'Marketing preference management',
       icon: 'Settings'
+    },
+    {
+      value: 'hipaa-privacy-notice',
+      label: 'HIPAA Privacy Notice',
+      description: 'HIPAA-compliant privacy notice for healthcare entities',
+      icon: 'Heart'
+    },
+    {
+      value: 'financial-privacy-notice',
+      label: 'Financial Privacy Notice',
+      description: 'Financial privacy notice for banking and finance',
+      icon: 'DollarSign'
+    },
+    {
+      value: 'biometric-data-notice',
+      label: 'Biometric Data Notice',
+      description: 'Biometric data collection and processing notice',
+      icon: 'Fingerprint'
     }
   ]
 
@@ -240,8 +258,63 @@ const WidgetBuilder = () => {
 
   const handleDeploy = () => {
     handleSave('active')
+}
+
+  const getContentPlaceholder = (field) => {
+    const placeholders = {
+      'hipaa-privacy-notice': {
+        title: 'HIPAA Privacy Notice',
+        message: 'This notice describes how medical information about you may be used and disclosed...',
+        policyUrl: 'https://yoursite.com/hipaa-privacy',
+        secondaryUrl: 'https://yoursite.com/patient-rights'
+      },
+      'financial-privacy-notice': {
+        title: 'Financial Privacy Notice',
+        message: 'We collect and use your personal financial information to provide banking services...',
+        policyUrl: 'https://yoursite.com/financial-privacy',
+        secondaryUrl: 'https://yoursite.com/opt-out'
+      },
+      'biometric-data-notice': {
+        title: 'Biometric Data Notice',
+        message: 'We collect biometric data for security and identification purposes...',
+        policyUrl: 'https://yoursite.com/biometric-privacy',
+        secondaryUrl: 'https://yoursite.com/biometric-consent'
+      }
+    }
+    
+    const defaults = {
+      title: 'We use cookies',
+      message: 'We use cookies to improve your experience on our website...',
+      policyUrl: 'https://yoursite.com/privacy',
+      secondaryUrl: 'https://yoursite.com/cookies'
+    }
+    
+    return placeholders[formData.type]?.[field] || defaults[field]
   }
 
+  const getContentLabel = (field) => {
+    const labels = {
+      'hipaa-privacy-notice': {
+        policyUrl: 'HIPAA Privacy Policy URL',
+        secondaryUrl: 'Patient Rights URL'
+      },
+      'financial-privacy-notice': {
+        policyUrl: 'Financial Privacy Policy URL',
+        secondaryUrl: 'Opt-Out URL'
+      },
+      'biometric-data-notice': {
+        policyUrl: 'Biometric Privacy Policy URL',
+        secondaryUrl: 'Consent Form URL'
+      }
+    }
+    
+    const defaults = {
+      policyUrl: 'Privacy Policy URL',
+      secondaryUrl: 'Cookie Policy URL'
+    }
+    
+    return labels[formData.type]?.[field] || defaults[field]
+  }
   const renderTabContent = () => {
     switch (activeTab) {
       case 'type':
@@ -396,7 +469,7 @@ const WidgetBuilder = () => {
           </div>
         )
 
-      case 'content':
+case 'content':
         return (
           <div className="space-y-6">
             <div>
@@ -408,14 +481,14 @@ const WidgetBuilder = () => {
                   label="Title"
                   value={formData.content.title}
                   onChange={(e) => handleNestedChange('content', 'title', e.target.value)}
-                  placeholder="We use cookies"
+                  placeholder={getContentPlaceholder('title')}
                 />
                 
                 <FormField
                   label="Message"
                   value={formData.content.message}
                   onChange={(e) => handleNestedChange('content', 'message', e.target.value)}
-                  placeholder="We use cookies to improve your experience on our website..."
+                  placeholder={getContentPlaceholder('message')}
                 />
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -434,28 +507,57 @@ const WidgetBuilder = () => {
                   />
                   
                   <FormField
-                    label="Manage Button Text"
+                    label="Learn More Button Text"
                     value={formData.content.manageText}
                     onChange={(e) => handleNestedChange('content', 'manageText', e.target.value)}
-                    placeholder="Manage Preferences"
+                    placeholder="Learn More"
                   />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
-                    label="Privacy Policy URL"
+                    label={getContentLabel('policyUrl')}
                     value={formData.content.privacyPolicyUrl}
                     onChange={(e) => handleNestedChange('content', 'privacyPolicyUrl', e.target.value)}
-                    placeholder="https://yoursite.com/privacy"
+                    placeholder={getContentPlaceholder('policyUrl')}
                   />
                   
                   <FormField
-                    label="Cookie Policy URL"
+                    label={getContentLabel('secondaryUrl')}
                     value={formData.content.cookiePolicyUrl}
                     onChange={(e) => handleNestedChange('content', 'cookiePolicyUrl', e.target.value)}
-                    placeholder="https://yoursite.com/cookies"
+                    placeholder={getContentPlaceholder('secondaryUrl')}
                   />
                 </div>
+
+                {/* Specialized Content for Compliance Notices */}
+                {(formData.type === 'hipaa-privacy-notice' || 
+                  formData.type === 'financial-privacy-notice' || 
+                  formData.type === 'biometric-data-notice') && (
+                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-3">Compliance Information</h4>
+                    <div className="space-y-4">
+                      <FormField
+                        label="Entity Name"
+                        value={formData.content.entityName || ''}
+                        onChange={(e) => handleNestedChange('content', 'entityName', e.target.value)}
+                        placeholder="Your Organization Name"
+                      />
+                      <FormField
+                        label="Contact Information"
+                        value={formData.content.contactInfo || ''}
+                        onChange={(e) => handleNestedChange('content', 'contactInfo', e.target.value)}
+                        placeholder="Privacy Officer contact details"
+                      />
+                      <FormField
+                        label="Effective Date"
+                        type="date"
+                        value={formData.content.effectiveDate || ''}
+                        onChange={(e) => handleNestedChange('content', 'effectiveDate', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -793,6 +895,72 @@ const WidgetBuilder = () => {
                 </div>
               </div>
             </div>
+)}
+
+          {/* Preview Modal */}
+          {showPreview && formData.type && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
+                <div className="p-6 border-b border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-gray-900">Widget Preview</h3>
+                    <button
+                      onClick={() => setShowPreview(false)}
+                      className="p-2 rounded-lg hover:bg-gray-100"
+                    >
+                      <ApperIcon name="X" className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="bg-gray-100 rounded-lg p-8 relative min-h-[400px]">
+                    <div 
+                      className="absolute bg-white rounded-lg shadow-xl border p-6 max-w-md"
+                      style={{
+                        backgroundColor: formData.appearance.backgroundColor,
+                        color: formData.appearance.textColor,
+                        borderRadius: `${formData.appearance.borderRadius}px`,
+                        ...(formData.appearance.position.includes('right') && { right: '20px' }),
+                        ...(formData.appearance.position.includes('left') && { left: '20px' }),
+                        ...(formData.appearance.position.includes('top') && { top: '20px' }),
+                        ...(formData.appearance.position.includes('bottom') && { bottom: '20px' }),
+                        ...(formData.appearance.position === 'center' && { 
+                          top: '50%', 
+                          left: '50%', 
+                          transform: 'translate(-50%, -50%)' 
+                        })
+                      }}
+                    >
+                      {formData.content.title && (
+                        <h4 className="text-lg font-semibold mb-3">{formData.content.title}</h4>
+                      )}
+                      {formData.content.message && (
+                        <p className="text-sm mb-4 leading-relaxed">{formData.content.message}</p>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          className="px-4 py-2 text-sm rounded font-medium text-white transition-colors hover:opacity-90"
+                          style={{ backgroundColor: formData.appearance.primaryColor }}
+                        >
+                          {formData.content.acceptText}
+                        </button>
+                        <button className="px-4 py-2 text-sm rounded font-medium border border-gray-300 hover:bg-gray-50">
+                          {formData.content.declineText}
+                        </button>
+                        {formData.content.manageText && (
+                          <button className="px-4 py-2 text-sm rounded font-medium text-blue-600 hover:underline">
+                            {formData.content.manageText}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-center text-sm text-gray-500">
+                    Live preview of your {formData.type.replace('-', ' ')} widget
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Action Buttons */}
@@ -808,7 +976,7 @@ const WidgetBuilder = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => toast.info('Preview functionality coming soon')}
+                onClick={() => setShowPreview(true)}
               >
                 <ApperIcon name="Eye" className="h-4 w-4 mr-2" />
                 Preview
@@ -825,6 +993,13 @@ const WidgetBuilder = () => {
               {isEditing ? 'Update Widget' : 'Deploy Widget'}
             </Button>
           </div>
+<Button
+                variant="outline"
+                onClick={() => setShowPreview(true)}
+              >
+                <ApperIcon name="Eye" className="h-4 w-4 mr-2" />
+                Preview
+              </Button>
         </div>
       </div>
     </div>

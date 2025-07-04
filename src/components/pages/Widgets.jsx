@@ -214,16 +214,36 @@ const filterWidgets = () => {
             Popular Widget Templates
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
+{[
               {
                 title: 'Cookie Banner',
                 description: 'GDPR compliant cookie consent banner',
-                icon: 'Cookie'
+                icon: 'Cookie',
+                featured: true
               },
               {
                 title: 'Privacy Center',
                 description: 'User privacy preference center',
-                icon: 'Shield'
+                icon: 'Shield',
+                featured: true
+              },
+              {
+                title: 'HIPAA Privacy Notice',
+                description: 'Healthcare privacy notice for HIPAA compliance',
+                icon: 'Heart',
+                featured: true
+              },
+              {
+                title: 'Financial Privacy Notice',
+                description: 'Banking and financial privacy disclosure',
+                icon: 'DollarSign',
+                featured: true
+              },
+              {
+                title: 'Biometric Data Notice',
+                description: 'Biometric data collection and processing notice',
+                icon: 'Fingerprint',
+                featured: true
               },
               {
                 title: 'Consent Form',
@@ -251,19 +271,34 @@ const filterWidgets = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="border-2 border-dashed border-gray-200 rounded-xl p-6 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                className={`border-2 border-dashed rounded-xl p-6 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer ${
+                  template.featured 
+                    ? 'border-primary/30 bg-primary/5' 
+                    : 'border-gray-200'
+                }`}
                 onClick={handleCreateWidget}
               >
                 <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <ApperIcon name={template.icon} className="h-5 w-5 text-primary" />
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    template.featured 
+                      ? 'bg-primary text-white' 
+                      : 'bg-primary/10 text-primary'
+                  }`}>
+                    <ApperIcon name={template.icon} className="h-5 w-5" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                    {template.featured && (
+                      <span className="text-xs bg-success text-white px-2 py-0.5 rounded-full">
+                        Compliance Ready
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-                <Button variant="outline" size="sm">
+                <Button variant={template.featured ? "primary" : "outline"} size="sm">
                   <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
-                  Use Template
+                  {template.featured ? 'Start Setup' : 'Use Template'}
                 </Button>
               </motion.div>
             ))}

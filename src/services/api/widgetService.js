@@ -4,11 +4,13 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 // Mock widget data (simulates database)
 let widgets = [
   {
-    id: 'widget_1',
+    Id: 1,
     name: 'Cookie Consent Banner',
     type: 'cookie-banner',
     status: 'active',
     description: 'GDPR compliant cookie consent banner',
+    platform: 'web',
+    impressions: 15420,
     config: {
       theme: 'light',
       position: 'bottom',
@@ -24,11 +26,13 @@ let widgets = [
     deployedAt: '2024-01-15T10:30:00Z'
   },
   {
-    id: 'widget_2',
+    Id: 2,
     name: 'Privacy Preference Center',
     type: 'privacy-center',
     status: 'active',
     description: 'User privacy preferences management',
+    platform: 'web',
+    impressions: 8930,
     config: {
       theme: 'light',
       position: 'modal',
@@ -42,11 +46,76 @@ let widgets = [
     deployedAt: '2024-01-14T15:45:00Z'
   },
   {
-    id: 'widget_3',
+    Id: 3,
+    name: 'HIPAA Privacy Notice',
+    type: 'hipaa-privacy-notice',
+    status: 'active',
+    description: 'Healthcare privacy notice for HIPAA compliance',
+    platform: 'web',
+    impressions: 3250,
+    config: {
+      theme: 'light',
+      position: 'top-banner',
+      size: 'large',
+      animation: 'slide-down',
+      entityName: 'Healthcare Provider Inc.',
+      contactInfo: 'privacy@healthcare.com',
+      effectiveDate: '2024-01-01'
+    },
+    createdAt: '2024-01-16T09:00:00Z',
+    lastUpdated: '2024-01-16T09:00:00Z',
+    deployedAt: '2024-01-16T09:00:00Z'
+  },
+  {
+    Id: 4,
+    name: 'Financial Privacy Notice',
+    type: 'financial-privacy-notice',
+    status: 'active',
+    description: 'Banking and financial privacy disclosure',
+    platform: 'web',
+    impressions: 5680,
+    config: {
+      theme: 'light',
+      position: 'bottom-right',
+      size: 'medium',
+      animation: 'slide-up',
+      entityName: 'First National Bank',
+      contactInfo: 'privacy@firstnational.com',
+      effectiveDate: '2024-01-01'
+    },
+    createdAt: '2024-01-17T11:30:00Z',
+    lastUpdated: '2024-01-17T11:30:00Z',
+    deployedAt: '2024-01-17T11:30:00Z'
+  },
+  {
+    Id: 5,
+    name: 'Biometric Data Notice',
+    type: 'biometric-data-notice',
+    status: 'draft',
+    description: 'Biometric data collection and processing notice',
+    platform: 'web',
+    impressions: 0,
+    config: {
+      theme: 'light',
+      position: 'center',
+      size: 'large',
+      animation: 'fade-in',
+      entityName: 'SecureAccess Corp',
+      contactInfo: 'privacy@secureaccess.com',
+      effectiveDate: '2024-02-01'
+    },
+    createdAt: '2024-01-18T14:15:00Z',
+    lastUpdated: '2024-01-18T14:15:00Z',
+    deployedAt: null
+  },
+  {
+    Id: 6,
     name: 'Data Processing Consent',
     type: 'consent-form',
     status: 'draft',
     description: 'Data processing consent form',
+    platform: 'web',
+    impressions: 0,
     config: {
       theme: 'light',
       position: 'inline',
@@ -100,11 +169,11 @@ class WidgetService {
     }
   }
 
-  async getWidget(id) {
+async getWidget(id) {
     try {
       await delay(300)
       
-      const widget = widgets.find(w => w.id === id)
+      const widget = widgets.find(w => w.Id === parseInt(id))
       
       if (!widget) {
         throw new Error('Widget not found')
@@ -131,12 +200,15 @@ async createWidget(widgetData) {
         throw new Error('Widget name and type are required')
       }
       
+      const newId = Math.max(...widgets.map(w => w.Id), 0) + 1
       const newWidget = {
-        id: `widget_${Date.now()}`,
+        Id: newId,
         name: widgetData.name,
         type: widgetData.type,
         status: widgetData.status || 'draft',
         description: widgetData.description || '',
+        platform: widgetData.platform || 'web',
+        impressions: 0,
         config: widgetData.config || {},
         createdAt: new Date().toISOString(),
         lastUpdated: new Date().toISOString(),
@@ -158,11 +230,11 @@ async createWidget(widgetData) {
     }
   }
 
-  async updateWidget(id, updateData) {
+async updateWidget(id, updateData) {
     try {
       await delay(600)
       
-      const widgetIndex = widgets.findIndex(w => w.id === id)
+      const widgetIndex = widgets.findIndex(w => w.Id === parseInt(id))
       
       if (widgetIndex === -1) {
         throw new Error('Widget not found')
@@ -171,6 +243,7 @@ async createWidget(widgetData) {
       const updatedWidget = {
         ...widgets[widgetIndex],
         ...updateData,
+        Id: parseInt(id),
         lastUpdated: new Date().toISOString()
       }
       
@@ -189,11 +262,11 @@ async createWidget(widgetData) {
     }
   }
 
-  async deleteWidget(id) {
+async deleteWidget(id) {
     try {
       await delay(400)
       
-      const widgetIndex = widgets.findIndex(w => w.id === id)
+      const widgetIndex = widgets.findIndex(w => w.Id === parseInt(id))
       
       if (widgetIndex === -1) {
         throw new Error('Widget not found')
@@ -306,9 +379,57 @@ async createWidget(widgetData) {
     }
 }
 
-  // Standard API methods for component compatibility
-  async getAll(filters = {}) {
-    return this.getWidgets(filters)
+// Standard API methods for component compatibility
+  async getAll() {
+    await delay(400)
+    return [...widgets]
+  }
+
+  async getById(id) {
+    await delay(300)
+    const widget = widgets.find(w => w.Id === parseInt(id))
+    if (!widget) {
+      throw new Error('Widget not found')
+    }
+    return widget
+  }
+
+  async create(widgetData) {
+    await delay(800)
+    const newId = Math.max(...widgets.map(w => w.Id), 0) + 1
+    const newWidget = {
+      Id: newId,
+      ...widgetData,
+      impressions: 0,
+      lastUpdated: new Date().toISOString()
+    }
+    widgets.push(newWidget)
+    return newWidget
+  }
+
+  async update(id, updateData) {
+    await delay(600)
+    const index = widgets.findIndex(w => w.Id === parseInt(id))
+    if (index === -1) {
+      throw new Error('Widget not found')
+    }
+    widgets[index] = {
+      ...widgets[index],
+      ...updateData,
+      Id: parseInt(id),
+      lastUpdated: new Date().toISOString()
+    }
+    return widgets[index]
+  }
+
+  async delete(id) {
+    await delay(400)
+    const index = widgets.findIndex(w => w.Id === parseInt(id))
+    if (index === -1) {
+      throw new Error('Widget not found')
+    }
+    widgets.splice(index, 1)
+    return true
   }
 
   async getRecent(limit = 5) {
@@ -319,7 +440,7 @@ async createWidget(widgetData) {
         data: result.data
           .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
           .slice(0, limit)
-}
+      }
     }
     return result
   }
