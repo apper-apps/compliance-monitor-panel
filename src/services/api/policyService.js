@@ -46,11 +46,11 @@ class PolicyService {
     }
   }
 
-  async getPolicy(id) {
+async getPolicy(id) {
     try {
       await delay(300)
       
-      const policy = policies.find(p => p.id === id)
+      const policy = policies.find(p => p.Id === parseInt(id))
       
       if (!policy) {
         throw new Error('Policy not found')
@@ -60,7 +60,7 @@ class PolicyService {
         success: true,
         data: policy
       }
-} catch (error) {
+    } catch (error) {
       return {
         success: false,
         error: error.message || 'Failed to fetch policy'
@@ -68,17 +68,18 @@ class PolicyService {
     }
   }
 
-  async createPolicy(policyData) {
+async createPolicy(policyData) {
     try {
       await delay(800)
       
       // Validate required fields
-      if (!policyData.name || !policyData.type) {
-        throw new Error('Policy name and type are required')
+      if (!policyData.title || !policyData.type) {
+        throw new Error('Policy title and type are required')
       }
       
+      const newId = Math.max(...policies.map(p => p.Id), 0) + 1
       const newPolicy = {
-        id: `policy_${Date.now()}`,
+        Id: newId,
         ...policyData,
         status: policyData.status || 'draft',
         createdAt: new Date().toISOString(),
@@ -101,11 +102,11 @@ class PolicyService {
     }
   }
 
-  async updatePolicy(id, updateData) {
+async updatePolicy(id, updateData) {
     try {
       await delay(600)
       
-      const policyIndex = policies.findIndex(p => p.id === id)
+      const policyIndex = policies.findIndex(p => p.Id === parseInt(id))
       
       if (policyIndex === -1) {
         throw new Error('Policy not found')
@@ -114,6 +115,7 @@ class PolicyService {
       const updatedPolicy = {
         ...policies[policyIndex],
         ...updateData,
+        Id: parseInt(id),
         lastUpdated: new Date().toISOString(),
         version: (policies[policyIndex].version || 1) + 1
       }
@@ -133,11 +135,11 @@ class PolicyService {
     }
   }
 
-  async deletePolicy(id) {
+async deletePolicy(id) {
     try {
       await delay(400)
       
-      const policyIndex = policies.findIndex(p => p.id === id)
+      const policyIndex = policies.findIndex(p => p.Id === parseInt(id))
       
       if (policyIndex === -1) {
         throw new Error('Policy not found')
@@ -216,9 +218,56 @@ class PolicyService {
     }
   }
 
-  // Standard API methods for component compatibility
-async getAll(filters = {}) {
-    return this.getPolicies(filters)
+// Standard API methods for component compatibility
+  async getAll() {
+    await delay(400)
+    return [...policies]
+  }
+
+  async getById(id) {
+    await delay(300)
+    const policy = policies.find(p => p.Id === parseInt(id))
+    if (!policy) {
+      throw new Error('Policy not found')
+    }
+    return policy
+  }
+
+  async create(policyData) {
+    await delay(800)
+    const newId = Math.max(...policies.map(p => p.Id), 0) + 1
+    const newPolicy = {
+      Id: newId,
+      ...policyData,
+      lastUpdated: new Date().toISOString()
+    }
+    policies.push(newPolicy)
+    return newPolicy
+  }
+
+  async update(id, updateData) {
+    await delay(600)
+    const index = policies.findIndex(p => p.Id === parseInt(id))
+    if (index === -1) {
+      throw new Error('Policy not found')
+    }
+    policies[index] = {
+      ...policies[index],
+      ...updateData,
+      Id: parseInt(id),
+      lastUpdated: new Date().toISOString()
+    }
+    return policies[index]
+  }
+
+  async delete(id) {
+    await delay(400)
+    const index = policies.findIndex(p => p.Id === parseInt(id))
+    if (index === -1) {
+      throw new Error('Policy not found')
+    }
+    policies.splice(index, 1)
+    return true
   }
 
   async getRecent(limit = 5) {

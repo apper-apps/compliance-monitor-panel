@@ -68,5 +68,82 @@
     "businessCountry": "de",
     "contactEmail": "dpo@dataflow.com",
     "websites": ["https://dataflow.com"]
+},
+  {
+    "Id": 6,
+    "title": "GDPR Privacy Policy (Complete)",
+    "description": "Comprehensive GDPR-compliant privacy policy with all required sections",
+    "type": "gdpr-compliance",
+    "status": "active",
+    "lastUpdated": "2024-03-16T08:00:00Z",
+    "businessName": "EuroTech Solutions",
+    "businessType": "saas",
+    "businessWebsite": "https://eurotech.eu",
+    "businessCountry": "de",
+    "contactEmail": "privacy@eurotech.eu",
+    "dataController": "EuroTech Solutions GmbH",
+    "legalBasis": "consent",
+    "retentionPeriod": "24 months after account closure",
+    "dataCollection": {
+      "personalData": true,
+      "cookies": true,
+      "analytics": true,
+      "marketing": false,
+      "thirdParty": true,
+      "biometric": false,
+      "location": true,
+      "financial": false
+    },
+    "cookieConsent": {
+      "essential": true,
+      "functional": true,
+      "analytics": true,
+      "marketing": false,
+      "preferences": true
+    },
+    "userRights": {
+      "access": true,
+      "rectification": true,
+      "erasure": true,
+      "portability": true,
+      "objection": true
+    },
+    "websites": ["https://eurotech.eu", "https://app.eurotech.eu"]
+  },
+  {
+    "Id": 7,
+    "title": "Terms of Service (B2B SaaS)",
+    "description": "Comprehensive terms of service for business software platform",
+    "type": "terms-of-service",
+    "status": "active",
+    "lastUpdated": "2024-03-15T12:30:00Z",
+    "businessName": "BusinessFlow Inc",
+    "businessType": "saas",
+    "businessWebsite": "https://businessflow.com",
+    "businessCountry": "us",
+    "contactEmail": "legal@businessflow.com",
+    "jurisdiction": "Delaware, USA",
+    "websites": ["https://businessflow.com"]
+  },
+  {
+    "Id": 8,
+    "title": "Cookie Consent Management",
+    "description": "GDPR-compliant cookie consent with granular user controls",
+    "type": "cookie-policy",
+    "status": "active",
+    "lastUpdated": "2024-03-14T16:15:00Z",
+    "businessName": "CookieWise Ltd",
+    "businessType": "corporate",
+    "businessWebsite": "https://cookiewise.com",
+    "businessCountry": "uk",
+    "contactEmail": "privacy@cookiewise.com",
+    "cookieConsent": {
+      "essential": true,
+      "functional": true,
+      "analytics": true,
+      "marketing": true,
+      "preferences": true
+    },
+    "websites": ["https://cookiewise.com"]
   }
 ]

@@ -18,11 +18,11 @@ const PolicyCard = ({
     inactive: 'default'
   }
 
-  const typeIcons = {
-    'privacy-policy': 'Shield',
+const typeIcons = {
+    'privacy-policy': 'Lock',
     'terms-of-service': 'FileText',
     'cookie-policy': 'Cookie',
-    'gdpr-compliance': 'Lock',
+    'gdpr-compliance': 'Shield',
     'ccpa-compliance': 'UserCheck'
   }
 

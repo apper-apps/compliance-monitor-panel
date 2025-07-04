@@ -34,13 +34,23 @@ const PolicyCreator = () => {
     dataController: '',
     contactEmail: '',
     
-    // Step 3: Policy Configuration
+// Step 3: Policy Configuration
     dataCollection: {
       personalData: false,
       cookies: false,
       analytics: false,
       marketing: false,
-      thirdParty: false
+      thirdParty: false,
+      biometric: false,
+      location: false,
+      financial: false
+    },
+    cookieConsent: {
+      essential: true,
+      functional: false,
+      analytics: false,
+      marketing: false,
+      preferences: false
     },
     legalBasis: '',
     retentionPeriod: '',
@@ -88,34 +98,37 @@ const PolicyCreator = () => {
     }
   ]
 
-  const policyTypes = [
+const policyTypes = [
     {
-      value: 'privacy-policy',
-      label: 'Privacy Policy',
-      description: 'Comprehensive privacy policy for your website',
-      icon: 'Shield'
-    },
-    {
-      value: 'cookie-policy',
-      label: 'Cookie Policy',
-      description: 'Detailed cookie usage and tracking policy',
-      icon: 'Cookie'
+      value: 'gdpr-compliance',
+      label: 'GDPR Privacy Policy',
+      description: 'Comprehensive GDPR-compliant privacy policy with all required sections',
+      icon: 'Shield',
+      featured: true
     },
     {
       value: 'terms-of-service',
       label: 'Terms of Service',
-      description: 'Terms and conditions for your services',
-      icon: 'FileText'
+      description: 'Comprehensive terms and conditions with legal protections',
+      icon: 'FileText',
+      featured: true
     },
     {
-      value: 'gdpr-compliance',
-      label: 'GDPR Compliance',
-      description: 'GDPR specific privacy policy',
+      value: 'cookie-policy',
+      label: 'Cookie Consent Policy',
+      description: 'GDPR-compliant cookie consent with granular controls',
+      icon: 'Cookie',
+      featured: true
+    },
+    {
+      value: 'privacy-policy',
+      label: 'General Privacy Policy',
+      description: 'Standard privacy policy for basic compliance',
       icon: 'Lock'
     },
     {
       value: 'ccpa-compliance',
-      label: 'CCPA Compliance',
+      label: 'CCPA Privacy Notice',
       description: 'California consumer privacy compliance',
       icon: 'UserCheck'
     }
@@ -141,13 +154,13 @@ const PolicyCreator = () => {
     { value: 'other', label: 'Other' }
   ]
 
-  const legalBasisOptions = [
-    { value: 'consent', label: 'Consent' },
-    { value: 'contract', label: 'Contract' },
-    { value: 'legal-obligation', label: 'Legal Obligation' },
-    { value: 'vital-interests', label: 'Vital Interests' },
-    { value: 'public-task', label: 'Public Task' },
-    { value: 'legitimate-interests', label: 'Legitimate Interests' }
+const legalBasisOptions = [
+    { value: 'consent', label: 'Consent (Article 6(1)(a))' },
+    { value: 'contract', label: 'Contract Performance (Article 6(1)(b))' },
+    { value: 'legal-obligation', label: 'Legal Obligation (Article 6(1)(c))' },
+    { value: 'vital-interests', label: 'Vital Interests (Article 6(1)(d))' },
+    { value: 'public-task', label: 'Public Task (Article 6(1)(e))' },
+    { value: 'legitimate-interests', label: 'Legitimate Interests (Article 6(1)(f))' }
   ]
 
   useEffect(() => {
@@ -237,7 +250,7 @@ const PolicyCreator = () => {
                 Select Policy Type
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {policyTypes.map((type) => (
+{policyTypes.map((type) => (
                   <motion.div
                     key={type.value}
                     whileHover={{ scale: 1.02 }}
@@ -245,6 +258,8 @@ const PolicyCreator = () => {
                     className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
                       formData.type === type.value
                         ? 'border-primary bg-primary/5'
+                        : type.featured
+                        ? 'border-primary/30 bg-primary/5 hover:border-primary'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => {
@@ -253,15 +268,24 @@ const PolicyCreator = () => {
                       handleInputChange('description', type.description)
                     }}
                   >
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        formData.type === type.value
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}>
-                        <ApperIcon name={type.icon} className="h-5 w-5" />
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          formData.type === type.value
+                            ? 'bg-primary text-white'
+                            : type.featured
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          <ApperIcon name={type.icon} className="h-5 w-5" />
+                        </div>
+                        <h4 className="font-semibold text-gray-900">{type.label}</h4>
                       </div>
-                      <h4 className="font-semibold text-gray-900">{type.label}</h4>
+                      {type.featured && (
+                        <span className="text-xs bg-success text-white px-2 py-1 rounded-full">
+                          GDPR Ready
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600">{type.description}</p>
                   </motion.div>
@@ -353,7 +377,7 @@ const PolicyCreator = () => {
           </div>
         )
 
-      case 3:
+case 3:
         return (
           <div className="space-y-6">
             <div>
@@ -362,9 +386,9 @@ const PolicyCreator = () => {
               </h3>
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-sm text-gray-600 mb-4">
-                  Select the types of data you collect:
+                  Select the types of data you collect (GDPR Article 13 & 14):
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {Object.entries(formData.dataCollection).map(([key, value]) => (
                     <label key={key} className="flex items-center space-x-3">
                       <input
@@ -382,10 +406,37 @@ const PolicyCreator = () => {
               </div>
             </div>
 
+            {(formData.type === 'cookie-policy' || formData.type === 'gdpr-compliance') && (
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-3">Cookie Consent Categories</h4>
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="text-sm text-blue-700 mb-4">
+                    Configure cookie categories for GDPR-compliant consent banner:
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(formData.cookieConsent).map(([key, value]) => (
+                      <label key={key} className="flex items-center space-x-3">
+                        <input
+                          type="checkbox"
+                          checked={value}
+                          onChange={(e) => handleNestedChange('cookieConsent', key, e.target.checked)}
+                          disabled={key === 'essential'}
+                          className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary disabled:opacity-50"
+                        />
+                        <span className="text-sm text-gray-700 capitalize">
+                          {key} {key === 'essential' && '(Required)'}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 type="select"
-                label="Legal Basis"
+                label="Primary Legal Basis (GDPR Article 6)"
                 value={formData.legalBasis}
                 onChange={(e) => handleInputChange('legalBasis', e.target.value)}
                 options={legalBasisOptions}
@@ -395,13 +446,16 @@ const PolicyCreator = () => {
                 label="Data Retention Period"
                 value={formData.retentionPeriod}
                 onChange={(e) => handleInputChange('retentionPeriod', e.target.value)}
-                placeholder="e.g., 2 years"
+                placeholder="e.g., 24 months, until account deletion"
               />
             </div>
 
             <div>
-              <h4 className="font-semibold text-gray-900 mb-3">User Rights</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">Data Subject Rights (GDPR Chapter III)</h4>
               <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm text-gray-600 mb-4">
+                  Select the rights you provide to data subjects:
+                </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(formData.userRights).map(([key, value]) => (
                     <label key={key} className="flex items-center space-x-3">
@@ -412,7 +466,11 @@ const PolicyCreator = () => {
                         className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                       />
                       <span className="text-sm text-gray-700 capitalize">
-                        Right to {key}
+                        Right to {key} {key === 'access' && '(Article 15)'}
+                        {key === 'rectification' && '(Article 16)'}
+                        {key === 'erasure' && '(Article 17)'}
+                        {key === 'portability' && '(Article 20)'}
+                        {key === 'objection' && '(Article 21)'}
                       </span>
                     </label>
                   ))}

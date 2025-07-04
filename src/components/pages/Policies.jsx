@@ -15,7 +15,10 @@ const filterOptions = [
   { value: 'all', label: 'All' },
   { value: 'active', label: 'Active' },
   { value: 'draft', label: 'Draft' },
-  { value: 'archived', label: 'Archived' }
+  { value: 'archived', label: 'Archived' },
+  { value: 'gdpr-compliance', label: 'GDPR Only' },
+  { value: 'terms-of-service', label: 'Terms Only' },
+  { value: 'cookie-policy', label: 'Cookie Only' }
 ];
 
 const Policies = () => {
@@ -191,42 +194,52 @@ const filterPolicies = () => {
       )}
 
       {/* Policy Templates */}
+{/* Policy Templates */}
       {policies.length === 0 && (
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Popular Policy Templates
+            GDPR & Privacy Compliance Templates
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               {
                 title: 'GDPR Privacy Policy',
-                description: 'Comprehensive privacy policy for EU compliance',
-                icon: 'Shield'
+                description: 'Comprehensive GDPR-compliant privacy policy with all required sections',
+                icon: 'Shield',
+                type: 'gdpr-compliance',
+                featured: true
               },
               {
-                title: 'CCPA Privacy Policy',
-                description: 'California consumer privacy compliance',
-                icon: 'UserCheck'
-              },
-              {
-                title: 'Cookie Policy',
-                description: 'Detailed cookie usage and tracking policy',
-                icon: 'Cookie'
+                title: 'Cookie Consent Banner',
+                description: 'GDPR-compliant cookie consent with granular controls',
+                icon: 'Cookie',
+                type: 'cookie-policy',
+                featured: true
               },
               {
                 title: 'Terms of Service',
-                description: 'Standard terms and conditions template',
-                icon: 'FileText'
+                description: 'Comprehensive terms and conditions with legal protections',
+                icon: 'FileText',
+                type: 'terms-of-service',
+                featured: true
+              },
+              {
+                title: 'CCPA Privacy Notice',
+                description: 'California consumer privacy compliance',
+                icon: 'UserCheck',
+                type: 'ccpa-compliance'
               },
               {
                 title: 'Data Processing Agreement',
-                description: 'GDPR compliant data processing terms',
-                icon: 'Database'
+                description: 'GDPR Article 28 compliant DPA template',
+                icon: 'Database',
+                type: 'gdpr-compliance'
               },
               {
                 title: 'E-commerce Privacy Policy',
-                description: 'Specialized for online retail businesses',
-                icon: 'ShoppingCart'
+                description: 'Specialized for online retail with payment processing',
+                icon: 'ShoppingCart',
+                type: 'privacy-policy'
               }
             ].map((template, index) => (
               <motion.div
@@ -234,25 +247,59 @@ const filterPolicies = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="border-2 border-dashed border-gray-200 rounded-xl p-6 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
+                className={`border-2 border-dashed rounded-xl p-6 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer ${
+                  template.featured 
+                    ? 'border-primary/30 bg-primary/5' 
+                    : 'border-gray-200'
+                }`}
                 onClick={handleCreatePolicy}
               >
                 <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <ApperIcon name={template.icon} className="h-5 w-5 text-primary" />
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                    template.featured 
+                      ? 'bg-primary text-white' 
+                      : 'bg-primary/10 text-primary'
+                  }`}>
+                    <ApperIcon name={template.icon} className="h-5 w-5" />
                   </div>
-                  <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{template.title}</h4>
+                    {template.featured && (
+                      <span className="text-xs bg-success text-white px-2 py-0.5 rounded-full">
+                        GDPR Ready
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <p className="text-sm text-gray-600 mb-4">{template.description}</p>
-                <Button variant="outline" size="sm">
+                <Button variant={template.featured ? "primary" : "outline"} size="sm">
                   <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
-                  Use Template
+                  {template.featured ? 'Start GDPR Setup' : 'Use Template'}
                 </Button>
               </motion.div>
             ))}
           </div>
+          
+          {/* GDPR Compliance Notice */}
+          <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
+            <div className="flex items-start space-x-3">
+              <ApperIcon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-blue-900 mb-2">GDPR Compliance Ready</h4>
+                <p className="text-sm text-blue-700 mb-3">
+                  Our templates include all required GDPR elements: legal basis, data subject rights, 
+                  controller information, retention periods, and cookie consent mechanisms.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Article 13 & 14</span>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Cookie Consent</span>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Data Subject Rights</span>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Legitimate Interest</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
     </div>
   )
 }

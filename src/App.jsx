@@ -9,7 +9,7 @@ import Clients from '@/components/pages/Clients'
 import ClientDetails from '@/components/pages/ClientDetails'
 import Settings from '@/components/pages/Settings'
 import Support from '@/components/pages/Support'
-
+import CookieConsentBanner from '@/components/organisms/CookieConsentBanner'
 function App() {
   return (
     <Layout>
@@ -24,8 +24,12 @@ function App() {
         <Route path="/clients" element={<Clients />} />
         <Route path="/clients/:id" element={<ClientDetails />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/support" element={<Support />} />
+<Route path="/support" element={<Support />} />
+        <Route path="/privacy-policy" element={<Policies />} />
+        <Route path="/cookie-policy" element={<Policies />} />
+        <Route path="/terms-of-service" element={<Policies />} />
       </Routes>
+      <CookieConsentBanner />
     </Layout>
   )
 }

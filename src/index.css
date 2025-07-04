@@ -124,3 +124,49 @@ body {
     background: rgba(255, 255, 255, 0.8);
   }
 }
+
+/* Cookie Consent Banner Styles */
+.cookie-consent-banner {
+  @apply fixed bottom-0 left-0 right-0 z-50 p-4;
+}
+
+@media (max-width: 640px) {
+  .cookie-consent-banner {
+    @apply p-2;
+  }
+}
+
+/* GDPR Compliance Indicators */
+.gdpr-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+}
+
+.gdpr-required {
+  @apply border-l-4 border-blue-500 bg-blue-50 p-3 rounded;
+}
+
+/* Cookie Settings Toggle */
+.cookie-toggle {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+}
+
+.cookie-toggle-slider {
+  @apply inline-block h-4 w-4 transform rounded-full bg-white transition;
+}
+
+/* Privacy Policy Sections */
+.policy-section {
+  @apply mb-8 p-6 bg-white border border-gray-200 rounded-lg;
+}
+
+.policy-section h3 {
+  @apply text-lg font-semibold text-gray-900 mb-4;
+}
+
+.policy-section p {
+  @apply text-gray-700 leading-relaxed mb-4;
+}
+
+.policy-section ul {
+  @apply list-disc list-inside space-y-2 text-gray-700;
+}
