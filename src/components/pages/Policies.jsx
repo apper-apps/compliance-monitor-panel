@@ -289,9 +289,9 @@ useEffect(() => {
                 <p className="text-sm text-blue-700 mb-3">
                   Our templates include all required GDPR elements: legal basis, data subject rights, 
                   controller information, retention periods, and cookie consent mechanisms.
-                </p>
+</p>
                 <div className="flex flex-wrap gap-2">
-<span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Article 13 & 14</span>
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Article 13 & 14</span>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Cookie Consent</span>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Data Subject Rights</span>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Legitimate Interest</span>
