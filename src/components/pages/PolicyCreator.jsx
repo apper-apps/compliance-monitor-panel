@@ -23,63 +23,10 @@ const PolicyCreator = () => {
   const [showAiToolbar, setShowAiToolbar] = useState(false)
   const [toolbarPosition, setToolbarPosition] = useState({ x: 0, y: 0 })
   
-  const [policyData, setPolicyData] = useState({
+const [policyData, setPolicyData] = useState({
     title: '',
     type: 'privacy-policy',
-    content: `# Privacy Policy
-
-## 1. Information We Collect
-
-We collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.
-
-### Personal Information
-- Name and contact information
-- Email address and phone number
-- Billing and shipping address
-- Payment information
-
-### Automatically Collected Information
-- Device information and IP address
-- Browser type and operating system
-- Pages visited and time spent on our site
-- Cookies and similar tracking technologies
-
-## 2. How We Use Your Information
-
-We use the information we collect to:
-- Provide, maintain, and improve our services
-- Process transactions and send related information
-- Send technical notices and support messages
-- Respond to your comments and questions
-- Communicate about products, services, and events
-
-## 3. Information Sharing
-
-We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.
-
-### Service Providers
-We may share your information with trusted third-party service providers who assist us in operating our website and conducting our business.
-
-### Legal Requirements
-We may disclose your information when required by law or to protect our rights, property, or safety.
-
-## 4. Data Security
-
-We implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
-
-## 5. Your Rights
-
-Depending on your location, you may have certain rights regarding your personal information, including:
-- The right to access your data
-- The right to correct inaccurate information
-- The right to delete your information
-- The right to data portability
-
-## 6. Contact Us
-
-If you have any questions about this Privacy Policy, please contact us at privacy@company.com.
-
-*Last updated: ${new Date().toLocaleDateString()}*`,
+    content: "# Privacy Policy\n\n## 1. Information We Collect\n\nWe collect information you provide directly to us, such as when you create an account, make a purchase, or contact us for support.\n\n### Personal Information\n- Name and contact information\n- Email address and phone number\n- Billing and shipping address\n- Payment information\n\n### Automatically Collected Information\n- Device information and IP address\n- Browser type and operating system\n- Pages visited and time spent on our site\n- Cookies and similar tracking technologies\n\n## 2. How We Use Your Information\n\nWe use the information we collect to:\n- Provide, maintain, and improve our services\n- Process transactions and send related information\n- Send technical notices and support messages\n- Respond to your comments and questions\n- Communicate about products, services, and events\n\n## 3. Information Sharing\n\nWe do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this policy.\n\n### Service Providers\nWe may share your information with trusted third-party service providers who assist us in operating our website and conducting our business.\n\n### Legal Requirements\nWe may disclose your information when required by law or to protect our rights, property, or safety.\n\n## 4. Data Security\n\nWe implement appropriate security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.\n\n## 5. Your Rights\n\nDepending on your location, you may have certain rights regarding your personal information, including:\n- The right to access your data\n- The right to correct inaccurate information\n- The right to delete your information\n- The right to data portability\n\n## 6. Contact Us\n\nIf you have any questions about this Privacy Policy, please contact us at privacy@company.com.\n\n*Last updated: " + new Date().toLocaleDateString() + "*",
     status: 'draft',
     lastUpdated: new Date().toISOString()
   })
