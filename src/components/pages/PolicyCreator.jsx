@@ -8,6 +8,7 @@ import Button from "@/components/atoms/Button";
 import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 import FormField from "@/components/molecules/FormField";
+import RichTextEditor from "@/components/molecules/RichTextEditor";
 import { policyService } from "@/services/api/policyService";
 
 const PolicyCreator = () => {
@@ -236,17 +237,16 @@ const loadPolicy = async () => {
           </div>
         </div>
 
-        {/* Editor */}
+{/* Editor */}
         <div className="relative">
-          <FormField
-            type="richtext"
+          <RichTextEditor
             value={policyData.content}
             onChange={handleContentChange}
             placeholder="Start writing your policy..."
-            className="min-h-[600px] p-8 border-0 focus:ring-0"
+            className="border-0"
+            minHeight="600px"
             ref={editorRef}
           />
-
           {/* AI Toolbar */}
           <AnimatePresence>
             {showAiToolbar && selectedText && (

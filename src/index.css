@@ -170,3 +170,120 @@ body {
 .policy-section ul {
   @apply list-disc list-inside space-y-2 text-gray-700;
 }
+
+/* Rich Text Editor Styles */
+.rich-text-editor {
+  @apply transition-all duration-200;
+}
+
+.rich-text-editor:hover {
+  @apply shadow-lg;
+}
+
+.rich-text-editor:focus-within {
+  @apply shadow-xl border-primary;
+}
+
+.block-note-editor {
+  @apply p-8;
+}
+
+.block-note-editor .bn-editor {
+  @apply text-gray-900;
+}
+
+.block-note-editor .bn-editor h1 {
+  @apply text-3xl font-bold text-gray-900 mb-4;
+}
+
+.block-note-editor .bn-editor h2 {
+  @apply text-2xl font-semibold text-gray-900 mb-3;
+}
+
+.block-note-editor .bn-editor h3 {
+  @apply text-xl font-medium text-gray-900 mb-2;
+}
+
+.block-note-editor .bn-editor p {
+  @apply text-gray-700 leading-relaxed mb-4;
+}
+
+.block-note-editor .bn-editor ul {
+  @apply list-disc list-inside space-y-1 text-gray-700 mb-4;
+}
+
+.block-note-editor .bn-editor ol {
+  @apply list-decimal list-inside space-y-1 text-gray-700 mb-4;
+}
+
+.block-note-editor .bn-editor blockquote {
+  @apply border-l-4 border-primary pl-4 italic text-gray-600 mb-4;
+}
+
+.block-note-editor .bn-editor code {
+  @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
+}
+
+.block-note-editor .bn-editor pre {
+  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto mb-4;
+}
+
+.block-note-editor .bn-editor strong {
+  @apply font-semibold text-gray-900;
+}
+
+.block-note-editor .bn-editor em {
+  @apply italic;
+}
+
+/* BlockNote theme overrides */
+.bn-editor .bn-block-content {
+  @apply transition-all duration-200;
+}
+
+.bn-editor .bn-block-content:hover {
+  @apply bg-gray-50;
+}
+
+.bn-editor .bn-block-content:focus-within {
+  @apply bg-white shadow-sm;
+}
+
+.bn-editor .bn-formatting-toolbar {
+  @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+}
+
+.bn-editor .bn-formatting-toolbar-button {
+  @apply hover:bg-gray-100 text-gray-700 hover:text-gray-900;
+}
+
+.bn-editor .bn-formatting-toolbar-button[data-active="true"] {
+  @apply bg-primary text-white;
+}
+
+.bn-editor .bn-slash-menu {
+  @apply bg-white border border-gray-200 rounded-lg shadow-lg;
+}
+
+.bn-editor .bn-slash-menu-item {
+  @apply hover:bg-gray-100 text-gray-700 hover:text-gray-900;
+}
+
+.bn-editor .bn-slash-menu-item[data-selected="true"] {
+  @apply bg-primary text-white;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .block-note-editor {
+    @apply p-4;
+  }
+  
+  .bn-editor .bn-formatting-toolbar {
+    @apply flex-wrap;
+  }
+  
+  .bn-editor .bn-formatting-toolbar-button {
+    @apply text-sm px-2 py-1;
+  }
+}
