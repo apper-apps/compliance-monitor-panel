@@ -26,20 +26,29 @@ const Widgets = () => {
     { value: 'inactive', label: 'Inactive' }
   ]
 
-  useEffect(() => {
+useEffect(() => {
     loadWidgets()
   }, [])
+
+  // Filter widgets when dependencies change
+  useEffect(() => {
+    filterWidgets()
+  }, [widgets, searchTerm, selectedFilter])
 
   useEffect(() => {
     filterWidgets()
   }, [widgets, searchTerm, selectedFilter])
 
-  const loadWidgets = async () => {
+const loadWidgets = async () => {
     try {
       setError(null)
       setLoading(true)
       const data = await widgetService.getAll()
       setWidgets(data)
+      // Ensure we have an array and call filterWidgets after setting widgets
+      if (Array.isArray(data)) {
+        setFilteredWidgets(data)
+      }
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,20 +56,26 @@ const Widgets = () => {
     }
   }
 
-  const filterWidgets = () => {
+const filterWidgets = () => {
+    // Ensure widgets is an array before filtering
+    if (!Array.isArray(widgets)) {
+      setFilteredWidgets([])
+      return
+    }
+
     let filtered = widgets
 
     // Filter by status
     if (selectedFilter !== 'all') {
-      filtered = filtered.filter(widget => widget.status === selectedFilter)
+      filtered = filtered.filter(widget => widget?.status === selectedFilter)
     }
 
-    // Filter by search term
+    // Filter by search term with null safety
     if (searchTerm) {
       filtered = filtered.filter(widget =>
-        widget.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        widget.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        widget.type.toLowerCase().includes(searchTerm.toLowerCase())
+        widget?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        widget?.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        widget?.type?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
@@ -173,10 +188,10 @@ const Widgets = () => {
           icon="Layout"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredWidgets.map((widget) => (
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.isArray(filteredWidgets) && filteredWidgets.map((widget) => (
             <motion.div
-              key={widget.Id}
+              key={widget?.id || widget?.Id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
