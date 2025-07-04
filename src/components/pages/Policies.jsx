@@ -188,10 +188,9 @@ const [searchTerm, setSearchTerm] = useState('')
                 onView={handleViewPolicy}
               />
             </motion.div>
-          ))}
+))}
         </div>
       )}
-)}
 
       {/* Policy Templates */}
       {policies.length === 0 && (
