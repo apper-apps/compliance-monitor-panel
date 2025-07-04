@@ -10,9 +10,8 @@ import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 import PolicyCard from "@/components/molecules/PolicyCard";
 import SearchBar from "@/components/molecules/SearchBar";
-import policyService from "@/services/api/policyService";
+import { policyService } from "@/services/api/policyService";
 import dashboardService from "@/services/api/dashboardService";
-
 const filterOptions = [
   { value: 'all', label: 'All' },
   { value: 'active', label: 'Active' },
