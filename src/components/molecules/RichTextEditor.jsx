@@ -1,7 +1,7 @@
-import '@blocknote/react/style.css'
+import "@blocknote/react/style.css";
 import React, { forwardRef, useEffect, useState } from "react";
 import { BlockNoteEditor } from "@blocknote/core";
-import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
+import BlockNoteView from "@blocknote/react";
 import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 

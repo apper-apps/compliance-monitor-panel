@@ -1,7 +1,7 @@
+@import "@blocknote/react/style.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @layer base {
   * {
     box-sizing: border-box;
