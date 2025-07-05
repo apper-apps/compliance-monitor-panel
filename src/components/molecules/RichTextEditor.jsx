@@ -1,190 +1,158 @@
-import React, { useEffect, useState, forwardRef } from 'react';
-import { BlockNoteEditor } from '@blocknote/core';
-import { BlockNoteView } from '@blocknote/react';
-import '@blocknote/react/style.css';
+import '@blocknote/react/style.css'
+import React, { forwardRef, useEffect, useState } from "react";
+import { BlockNoteEditor } from "@blocknote/core";
+import { BlockNoteView } from "@blocknote/react";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
 
-const RichTextEditor = forwardRef(({
-  value = '',
-  onChange,
-  placeholder = 'Start writing...',
+const RichTextEditor = forwardRef(({ 
+  initialContent = '', 
+  onChange = () => {}, 
+  placeholder = 'Start typing...',
   className = '',
-  minHeight = '600px',
-  ...props
+  readOnly = false,
+  minHeight = '300px'
 }, ref) => {
-  const [editor, setEditor] = useState(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [editor, setEditor] = useState(null)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const initializeEditor = async () => {
+    const initEditor = async () => {
       try {
-        // Parse existing content if it's markdown or plain text
-        let initialContent = [];
+        setLoading(true)
+        setError(null)
         
-        if (value && typeof value === 'string') {
-          // Convert markdown-style content to BlockNote format
-          const lines = value.split('\n');
-          let currentBlock = null;
-          
-          for (const line of lines) {
-            if (line.startsWith('# ')) {
-              if (currentBlock) initialContent.push(currentBlock);
-              currentBlock = {
-                type: 'heading',
-                props: { level: 1 },
-                content: [{ type: 'text', text: line.replace('# ', '') }]
-              };
-            } else if (line.startsWith('## ')) {
-              if (currentBlock) initialContent.push(currentBlock);
-              currentBlock = {
-                type: 'heading',
-                props: { level: 2 },
-                content: [{ type: 'text', text: line.replace('## ', '') }]
-              };
-            } else if (line.startsWith('### ')) {
-              if (currentBlock) initialContent.push(currentBlock);
-              currentBlock = {
-                type: 'heading',
-                props: { level: 3 },
-                content: [{ type: 'text', text: line.replace('### ', '') }]
-              };
-            } else if (line.startsWith('- ')) {
-              if (currentBlock && currentBlock.type !== 'bulletListItem') {
-                initialContent.push(currentBlock);
-                currentBlock = null;
-              }
-              initialContent.push({
-                type: 'bulletListItem',
-                content: [{ type: 'text', text: line.replace('- ', '') }]
-              });
-            } else if (line.trim() === '') {
-              if (currentBlock) {
-                initialContent.push(currentBlock);
-                currentBlock = null;
-              }
-            } else {
-              if (currentBlock) initialContent.push(currentBlock);
-              currentBlock = {
-                type: 'paragraph',
-                content: [{ type: 'text', text: line }]
-              };
-            }
-          }
-          
-          if (currentBlock) {
-            initialContent.push(currentBlock);
-          }
-        }
-
-        // Create BlockNote editor
         const newEditor = BlockNoteEditor.create({
-          initialContent: initialContent.length > 0 ? initialContent : [
+          initialContent: initialContent || [
             {
               type: 'paragraph',
-              content: []
+              content: ''
             }
           ],
-          placeholder
-        });
-
-        setEditor(newEditor);
-        setIsInitialized(true);
-      } catch (error) {
-        console.error('Failed to initialize rich text editor:', error);
-        // Fallback to basic editor
-        const fallbackEditor = BlockNoteEditor.create({
-          initialContent: [
-            {
-              type: 'paragraph',
-              content: value ? [{ type: 'text', text: value }] : []
+          onEditorContentChange: (editor) => {
+            try {
+              const content = editor.topLevelBlocks
+              onChange(content)
+            } catch (err) {
+              console.error('Error in content change handler:', err)
             }
-          ],
-          placeholder
-        });
-        setEditor(fallbackEditor);
-        setIsInitialized(true);
-      }
-    };
-
-    initializeEditor();
-  }, []);
-
-  // Handle content changes
-  useEffect(() => {
-    if (!editor || !isInitialized) return;
-
-    const handleChange = async () => {
-      try {
-        const blocks = editor.document;
-        
-        // Convert BlockNote format to markdown-style text
-        let markdownContent = '';
-        
-        for (const block of blocks) {
-          if (block.type === 'heading') {
-            const level = block.props.level || 1;
-            const prefix = '#'.repeat(level);
-            const text = block.content?.map(c => c.text || '').join('') || '';
-            markdownContent += `${prefix} ${text}\n\n`;
-          } else if (block.type === 'paragraph') {
-            const text = block.content?.map(c => c.text || '').join('') || '';
-            if (text.trim()) {
-              markdownContent += `${text}\n\n`;
-            }
-          } else if (block.type === 'bulletListItem') {
-            const text = block.content?.map(c => c.text || '').join('') || '';
-            markdownContent += `- ${text}\n`;
-          } else if (block.type === 'numberedListItem') {
-            const text = block.content?.map(c => c.text || '').join('') || '';
-            markdownContent += `1. ${text}\n`;
           }
-        }
-
-        // Clean up extra newlines
-        markdownContent = markdownContent.replace(/\n\n+/g, '\n\n').trim();
+        })
         
-        if (onChange) {
-          onChange(markdownContent);
-        }
-      } catch (error) {
-        console.error('Error converting content:', error);
+        setEditor(newEditor)
+        setIsInitialized(true)
+        setError(null)
+      } catch (err) {
+        console.error('Failed to initialize BlockNote editor:', err)
+        setError('Failed to load editor. Please refresh the page.')
+      } finally {
+        setLoading(false)
       }
-    };
+    }
 
-    editor.onChange(handleChange);
-    
+    initEditor()
+
     return () => {
-      editor.onChange(() => {});
-    };
-  }, [editor, isInitialized, onChange]);
+      if (editor) {
+        try {
+          // Cleanup if needed
+          setEditor(null)
+          setIsInitialized(false)
+        } catch (err) {
+          console.error('Error during editor cleanup:', err)
+        }
+      }
+    }
+  }, [])
 
-  if (!editor || !isInitialized) {
+  // Handle initial content changes
+  useEffect(() => {
+    if (editor && initialContent && typeof initialContent === 'string') {
+      try {
+        editor.replaceBlocks(editor.topLevelBlocks, [
+          {
+            type: 'paragraph',
+            content: initialContent
+          }
+        ])
+      } catch (err) {
+        console.error('Error setting initial content:', err)
+      }
+    }
+  }, [editor, initialContent])
+
+  // Loading state
+  if (loading) {
     return (
       <div 
-        className={`border border-gray-200 rounded-lg p-8 bg-white ${className}`}
+        className={`rich-text-editor border border-gray-300 rounded-lg bg-white ${className}`}
         style={{ minHeight }}
       >
-        <div className="flex items-center justify-center h-full">
-          <div className="text-gray-500">Loading editor...</div>
+        <div className="flex items-center justify-center p-8">
+          <div className="flex items-center space-x-2 text-gray-600">
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent"></div>
+            <span>Loading editor...</span>
+          </div>
         </div>
       </div>
-    );
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div 
+        className={`rich-text-editor border border-red-300 rounded-lg bg-red-50 ${className}`}
+        style={{ minHeight }}
+      >
+        <div className="flex items-center justify-center p-8">
+          <div className="text-center">
+            <div className="text-red-600 font-medium mb-2">Editor Error</div>
+            <div className="text-red-500 text-sm">{error}</div>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Editor not initialized
+  if (!isInitialized || !editor) {
+    return (
+      <div 
+        className={`rich-text-editor border border-gray-300 rounded-lg bg-gray-50 ${className}`}
+        style={{ minHeight }}
+      >
+        <div className="flex items-center justify-center p-8">
+          <div className="text-gray-500">Initializing editor...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div 
       ref={ref}
-      className={`rich-text-editor border border-gray-200 rounded-lg overflow-hidden bg-white ${className}`}
+      className={`rich-text-editor border border-gray-300 rounded-lg bg-white block-note-editor ${className}`}
       style={{ minHeight }}
     >
       <BlockNoteView
         editor={editor}
+        className="w-full"
         theme="light"
-        className="block-note-editor"
+        data-theming-css-variables-demo
       />
     </div>
-  );
-});
+  )
+})
 
-RichTextEditor.displayName = 'RichTextEditor';
+RichTextEditor.displayName = 'RichTextEditor'
 
-export default RichTextEditor;
+export default RichTextEditor
